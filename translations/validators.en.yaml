@@ -1,0 +1,30 @@
+new_store:
+    not_created: 'We could not create your store. (%error_message%)'
+    name:
+        not_blank: 'Please give your store a name'
+        min_length: 'Your store must have minimally {{ limit }} characters'
+    url:
+        not_blank: 'Please give your store an unique url to access it'
+        min_length: 'Your store url must have minimally {{ limit }} characters'
+        regex: 'Only use a-z, A-Z, 0-9, _, -'
+        not_equal_to: "It's prohibited to use this url"
+        already_in_use: 'This url is already in use'
+    email:
+        not_blank: 'Please give your store an unique email'
+        valid_email: 'Please enter a valid email'
+create_voucher:
+    code:
+        not_blank: 'Please enter a code'
+    amount:
+        not_blank: 'Please enter an amount'
+create_product:
+    name:
+        not_blank: 'Please enter a name'
+    description:
+        not_blank: 'Please enter a description'
+    short_description:
+        not_blank: 'Please enter a short description'
+    price:
+        not_blank: 'Please enter a price'
+    stock:
+        not_blank: 'Please enter an available stock (unlimited is -1)'

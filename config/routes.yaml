@@ -1,0 +1,49 @@
+index:
+    path: /
+    controller: App\Controller\DefaultController::index
+new:
+    path: /new-store
+    controller: App\Controller\DefaultController::newStore
+
+login:
+    path: /login
+    controller: App\Controller\UserController::login
+login_check:
+    path: /login-check
+logout:
+    path: /logout
+user:
+    path: /user/{username}
+    controller: App\Controller\UserController::user
+
+setup:
+    path: /setup
+    controller: App\Controller\SetupController::setup
+
+store_index:
+    path: /{store}
+    controller: App\Controller\DefaultController::storeIndex
+store_product:
+    path: /{store}/product/{product}
+    controller: App\Controller\DefaultController::storeProduct
+store_checkout:
+    path: /{store}/checkout
+    controller: App\Controller\DefaultController::storeCheckout
+store_do_order:
+    path: /{store}/do-order
+    controller: App\Controller\DefaultController::storeDoOrder
+store_do_check_voucher:
+    path: /{store}/do-check-voucher
+    controller: App\Controller\DefaultController::storeDoCheckVoucher
+store_do_remove_from_cart:
+    path: /{store}/do-remove-from-cart
+    controller: App\Controller\DefaultController::storeDoRemoveFromCart
+store_do_clear_cart:
+    path: /{store}/do-clear-cart
+    controller: App\Controller\DefaultController::storeDoClearCart
+store_search:
+    path: /{store}/search
+    controller: App\Controller\DefaultController::storeSearch
+store_admin:
+    path: /{store}/admin/{page}
+    controller: App\Controller\DefaultController::storeAdmin

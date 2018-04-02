@@ -1,0 +1,291 @@
+{% extends 'theme1/layout.html.twig' %}
+
+{% set service_page_links %}
+    {% for text,link in current_store.links %}
+        <li class="nav-item"><a href="{{ link }}" class="nav-link">{{ text }}</a></li>
+    {% endfor %}
+{% endset %}
+{% set service = {
+    'page_name': current_store.name,
+    'page_logo_link': '/' ~ current_store.url,
+    'page_author': current_store.owner.username,
+    'page_description': current_store.description,
+    'page_keywords': current_store.keywords|join(','),
+    'page_links': service_page_links,
+    'page_google_webdev': current_store.googleWebDeveloper,
+    'page_ga_id': current_store.googleAnalyticsId,
+    'page_logo_url': ''
+} %}
+{% set language = app.request.getLocale() %}
+{% set currency = app.session.get('_currency') %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="/css/starrr.css" />
+    <style>
+        /*.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }*/
+    </style>
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org/",
+    "@type": "Product",
+    "name": "{{ current_product.name(language) }}",
+    "image": "https://www.orbitrondev.org/app/img/products/arepa-con-ceso.jpg",
+    "description": "{{ current_product.description(language) }}",
+    "mpn": "1",
+    "brand": {
+        "@type": "Thing",
+        "name": "{{ current_store.name }}"
+    },
+    "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ current_product.ratingAverage }}",
+        "reviewCount": "{{ current_product.ratingCount }}"
+    },
+    "offers": {
+        "@type": "Offer",
+        "priceCurrency": "{{ currency }}",
+        "price": "{% if current_product.inSale(currency) %}{{ current_product.salePrice(currency)|number_format(2, '.', '\'') }}{% else %}{{ current_product.price(currency)|number_format(2, '.', '\'') }}{% endif %}",
+        "priceValidUntil": "2020-01-01",
+        "itemCondition": "http://schema.org/UsedCondition",
+        "availability": "http://schema.org/InStock",
+        "seller": {
+            "@type": "Organization",
+            "name": "{{ current_store.name }}"
+        }
+    }
+}
+    </script>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="/js/starrr.js"></script>
+    <script>
+        $('#product-count').change(function() {
+            var price = {{ current_product.price(currency) }};
+            var $price = $("#output-price");
+            var $price_sale = $("#output-price-sale");
+            var $count = $('#product-count');
+            $price.html("<b>" + number_format(price * $count.val(), 2, '.', '\'') + " {{ currency }}</b>");
+            if($price_sale.length !== 0) {
+                var sale = {% if current_product.inSale(currency) %}{{ current_product.salePrice(currency) }}{% else %}null{% endif %};
+                $price_sale.html("<b>" + number_format(sale * $count.val(), 2, '.', '\'') + " {{ currency }}</b>");
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('.starrr').starrr({
+                change: function(e, value) {
+                    $('#ratings-hidden').val(value);
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block title %}{{ 'service_product.title'|trans }} | {{ service.page_name }}{% endblock %}
+
+{% block header %}
+    <div class="container">
+        <h1 class="mt-4 mb-2 pb-2 border-bottom">{{ current_product.name(language) }}</h1>
+    </div>
+{% endblock %}
+
+{% block breadcrumb %}
+    <div class="container">
+        <div class="mb-2 pb-2 border-bottom">
+            <a class="btn btn-outline-primary" href="{{ path('store_index', {'store': current_store.url}) }}" role="button">{{ 'service_general.nav.home'|trans }}</a>
+            <a class="btn btn-outline-primary" href="{{ path('store_checkout', {'store': current_store.url}) }}" role="button">{{ 'service_general.nav.checkout'|trans }}</a>
+
+            <div class="dropdown shopping-cart pull-right">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-shopping-cart fa-2x"></i>
+                    <span class="badge badge-secondary pull-right">{{ cart.system.total_count }}</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shopping-cart-open">
+                    <div class="products-list">
+                        <div class="mCustomScrollbar">
+                            {% if cart|length == 0 %}
+                                <span class="shc-title">{{ 'service_general.nav.cart_empty'|trans }}</span>
+                                <hr style="margin-bottom:0;margin-top:5px" />
+                            {% else %}
+                                {% for product in cart %}
+                                    {% if product.id != 0 %}
+                                        <div class="products">
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <img alt="" class="img-fluid img-tab-space" src="https://placehold.it/500x500{{ product.small_icon }}" />
+                                                </div>
+                                                <div class="col-8">
+                                                    <a href="{{ path('store_do_remove_from_cart', {'store': current_store.url, 'product': product.id}) }}" class="close" data-dismiss="alert" aria-hidden="true">×</a>
+                                                    <a class="product-link" href="{{ path('store_product', {'store': current_store.url, 'product': product.id}) }}">{{ product.name }}</a>
+                                                    <p class="products-price">{{ product.in_cart }} x {% if product.in_sale %}{{ product.price_sale|number_format(2, '.', '\'') }} {{ currency }}{% else %}{{ product.price|number_format(2, '.', '\'') }} {{ currency }}{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr style="margin-bottom:10px;margin-top:-25px" />
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="checkout-bottom">
+                        <a href="{{ path('store_checkout', {'store': current_store.url}) }}" class="btn btn-primary btn-xs"><i class="fa fa-shopping-cart"></i> {{ 'service_general.nav.checkout'|trans }}</a>
+                        <span class="shc-total">{{ 'service_general.nav.total'|trans }} <strong>{{ cart.system.total_price|number_format(2, '.', '\'') }} $</strong></span> {# TODO: Make this editable by the user #}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    {% if not current_product.closed %}
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            {# <img class="img-responsive" src="%cdn%/img/store/{{ current_product.big_icon }}" alt="" /> #}{# TODO: Add product images #}
+                            <img src="https://placehold.it/500x500" class="img-fluid rounded" alt="" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            {{ form_start(add_to_cart_form) }}
+                                <div class="col pull-left" style="width:9rem">
+                                    <div class="row">
+                                        <div class="input-group">
+                                            {% if current_product.stock > 0 %}
+                                                {{ form_widget(add_to_cart_form.product_count, {'id': 'product-count', 'attr': {'class': 'form-control', 'aria-describedby': 'product-count-desc', 'min': 1, 'max': current_product.stock, 'default': 1, 'value': 1}}) }}
+                                            {% else %}
+                                                {{ form_widget(add_to_cart_form.product_count, {'id': 'product-count', 'attr': {'class': 'form-control', 'aria-describedby': 'product-count-desc', 'min': 0, 'max': 0, 'default': 0, 'value': 0}}) }}
+                                            {% endif %}
+                                            <div class="input-group-append">
+                                                <div class="input-group-text" id="product-count-desc">{{ 'service_product.pieces'|trans }}</div>
+                                            </div>
+                                        </div>
+                                        {% if current_product.stock > 0 %}
+                                            <p class="help-block text-success"><b>{{ 'service_product.available_stock'|trans }}: {{ current_product.stock }}</b></p>
+                                        {% else %}
+                                            <h4 class="help-block text-danger"><b>{{ 'service_general.sold_out'|trans }}</b></h4>
+                                        {% endif %}
+                                        <span class="help-block text-danger">{{ form_errors(add_to_cart_form.product_count) }}</span>
+                                        <span class="help-block text-success">
+                                            {% for message in app.session.flashbag.get('product_added') %}
+                                                {{ message }}
+                                            {% endfor %}
+                                        </span>
+
+                                    </div>
+                                </div>
+                                <span class="pull-right">
+                                    {% if current_product.inSale(currency) %}
+                                        <span class="text-danger mr-2"><b>{{ 'service_general.sale'|trans }}</b></span><del>
+                                    {% endif %}
+                                    <span id="output-price">
+                                        <b>
+                                            {% if current_product.price(currency) == 0 %}
+                                                {{ 'service_general.free'|trans }}
+                                            {% else %}
+                                                {{ current_product.price(currency)|number_format(2, '.', '\'') }} {{ currency }}
+                                            {% endif %}
+                                        </b>
+                                    </span>
+                                    {% if current_product.inSale(currency) %}
+                                        </del>
+                                        <span id="output-price-sale" class="ml-2 mr-2">
+                                            {% if current_product.salePrice(currency) == 0 %}
+                                                <b>{{ 'service_general.free'|trans }}</b>
+                                            {% else %}
+                                                <b>{{ current_product.salePrice(currency)|number_format(2, '.', '\'') }} {{ currency }}</b>
+                                            {% endif %}
+                                        </span>
+                                    {% endif %}
+                                    {{ form_widget(add_to_cart_form.send, {'attr': {'class': 'btn btn-primary'}}) }}
+                                </span>
+                            {{ form_end(add_to_cart_form) }}
+                        </div>
+                    </div>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <a href="{{ path('store_product', {'store': current_store.url, 'product': current_product.id}) }}">{{ current_product.name(language) }}</a>
+                                {% if current_product.inSale(currency) %}
+                                    <span class="text-danger">({{ ((1 - (current_product.salePrice(currency) / current_product.price(currency))) * 100)|round }}% {{ 'service_product.discount'|trans }})</span>
+                                {% endif %}
+                            </h4>
+                            <p>{{ current_product.description(language) }}</p>
+                            <hr />
+                            <div>
+                                <p class="pull-right">{{ current_product.ratingCount|number_format(0, '.', '\'') }} {{ 'service_product.comments'|trans }}</p>
+                                <p>{% for i in 1..5 %}<span class="fa fa-star{% if current_product.ratingAverage matches '/^[-+]?[0-9]*\\.?[0-9]+$/' and i > current_product.ratingAverage and i < (current_product.ratingAverage + 1) %}-half{% endif %}{% if i > current_product.ratingAverage %}-o{% endif %}"></span>&nbsp;{% endfor %}&nbsp;&nbsp;{{ current_product.ratingAverage|default(0) }} {{ 'service_product.stars'|trans }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        {{ form_start(add_comment_form, {'attr': {'class': 'col-md-7'}}) }}
+                            {{ form_row(add_comment_form.rating, {'id': 'ratings-hidden'}) }}
+                            {{ form_widget(add_comment_form.comment, {'attr': {'class': 'form-control animated', 'style': 'overflow:hidden; word-wrap:break-word; resize:vertical; height:54px'}}) }}
+                            <div class="text-right"><span class="stars starrr" data-rating="0" style="margin: 0"></span></div>
+                            {{ form_widget(add_comment_form.send, {'attr': {'class': 'btn btn-primary'}}) }}
+                        {{ form_end(add_comment_form) }}
+                    </div>
+                    {% if not comments|length == 0 %}
+                        {% for comment in comments %}
+                            <hr />
+                            <div>
+                                <a href="{{ path('user', {'username': comment.user.username}) }}">{{ comment.user.username }}</a>
+                                {% for i in 1..5 %}<span class="fa fa-star{% if i > comment.rating %}-o{% endif %}"></span>&nbsp;{% endfor %}
+                                <span class="pull-right">
+                                    {% set datediff = date().timestamp - comment.createdOn|date('U') %} {# Seconds #}
+                                    {% set dateDiffText = 'service_product.time.seconds_ago'|trans %}
+
+                                    {% if datediff > 60 %}
+                                        {% set datediff = datediff / 60 %} {# Minutes #}
+                                        {% set dateDiffText = 'service_product.time.minutes_ago'|trans %}
+                                        {% if datediff > 60 %}
+                                            {% set datediff = datediff / 60 %} {# Hours #}
+                                            {% set dateDiffText = 'service_product.time.hours_ago'|trans %}
+                                            {% if datediff > 24 %}
+                                                {% set datediff = datediff / 24 %} {# Days #}
+                                                {% set dateDiffText = 'service_product.time.days_ago'|trans %}
+                                                {% if datediff > 30 %}
+                                                    {% set datediff = datediff / 30 %} {# Months #}
+                                                    {% set dateDiffText = 'service_product.time.months_ago'|trans %}
+                                                    {% if datediff > 12 %}
+                                                        {% set datediff = datediff / 12 %} {# Years #}
+                                                        {% set dateDiffText = 'service_product.time.years_ago'|trans %}
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+
+                                    {{ (datediff)|round(0, 'floor') }} {{ dateDiffText }}
+                                </span>
+                                <p>{{ comment.comment }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <hr />
+                        <p class="text-center"><b><i>{{ 'service_product.comments_empty'|trans }}</i></b></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

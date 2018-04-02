@@ -1,0 +1,263 @@
+general:
+    title: 'OrbitronDev Store'
+    link:
+        list: 'All stores'
+        support: 'Support'
+        faq: 'FAQ'
+        settings: 'Settings'
+        logout: 'Logout'
+        login: 'Login'
+    copyright: '© 2013-2018 OrbitronDev. All rights reserved.'
+new_store:
+    title: 'Create new store'
+    form:
+        name:
+            label: 'Store name'
+            help: 'How should your store be called?'
+        url:
+            label: 'Store url'
+            help: 'This will be used to access your store over "https://store.orbitrondev.org/<url>/".'
+        email:
+            label: 'Email'
+            help: 'The email which is shown to users when sending an email'
+        language:
+            label: 'Default language'
+            options:
+                de: 'German (de)'
+                en: 'English (en)'
+        currency:
+            label: 'Default currency'
+            options:
+                usd: 'Dollar (USD)'
+                eur: 'Euro (EUR)'
+        send:
+            label: 'Create'
+list_stores:
+    title: 'Discover all stores'
+    breadcrumb:
+        store: 'Stores'
+    admin:
+        title: 'Administrate your stores'
+        new: 'Create new store'
+        panel: 'Admin panel'
+    list:
+        title: 'Store list'
+        name: 'Name'
+        owner: 'Owner'
+        tools: 'Tools'
+admin:
+    nav:
+        title: 'Admin'
+        quick_links: 'Quick links'
+        back: 'Back to service'
+        logout: 'Logout'
+    close: 'Close'
+    form:
+        create_voucher:
+            code:
+                label: 'Code'
+            type:
+                label: 'Type'
+            amount:
+                label: 'Amount'
+                options:
+                    percentage: 'Percentage'
+                    exact: 'Exact'
+            send:
+                label: 'Create'
+        create_product:
+            name:
+                label: 'Name'
+            description:
+                label: 'Description'
+            short_description:
+                label: 'Short description'
+            price:
+                label: 'Price'
+            sale_price:
+                label: 'Price (Sale)'
+            stock:
+                label: 'Available in stock'
+            send:
+                label: 'Create'
+    page:
+        not_found:
+            title: '404 Error'
+            text: 'Page not found'
+        home:
+            title: 'Main dashboard'
+            breadcrumb:
+                home: 'Home'
+        catalogue:
+            title: 'Catalogue/Products'
+            breadcrumb:
+                shop: 'Shop'
+                product: 'Products'
+            create: 'Create product'
+            table:
+                name: 'Name'
+                sh_desc: 'Short description'
+                lo_desc: 'Long description'
+                price: 'Price'
+                sale_price: 'SALE! Price'
+                sm_image: 'Small image'
+                xl_image: 'Big image'
+        orders:
+            title: 'Orders'
+            breadcrumb:
+                shop: 'Shop'
+                order: 'Orders'
+            table:
+                id: 'ID'
+                products: 'Products'
+                delivery: 'Delivery'
+                status: 'Status'
+                full_name: 'Full name'
+                email: 'Email'
+                phone: 'Phone'
+                street_house_nr: 'Street & House Nr.'
+                zip_city: 'ZIP code & City'
+                country: 'Country'
+            price: 'Price'
+            amount: 'Amount'
+            free: 'Free'
+            total: 'Total price'
+            status:
+                not_processed: 'Not processed'
+                process: 'Process'
+                not_sent: 'Not sent'
+                send: 'Send'
+                sent: 'Sent'
+        vouchers:
+            title: 'Voucher'
+            breadcrumb:
+                shop: 'Shop'
+                voucher: 'Voucher'
+            create: 'Create voucher'
+            table:
+                code: 'Code'
+                type: 'Type'
+                amount: 'Amount'
+        create_voucher:
+            title: 'Create voucher'
+        create_product:
+            title: 'Create product'
+
+service_general:
+    nav:
+        profile: 'Profile'
+        settings: 'Settings'
+        logout: 'Logout'
+        login: 'Login'
+        admin: 'Admin Panel'
+        toggle_nav: 'Toggle navigation'
+        home: 'Home'
+        checkout: 'Checkout'
+        cart_empty: 'No products in cart'
+        total: 'Total:'
+    sale: 'SALE!'
+    free: 'Free'
+    sold_out: 'Sold out!'
+    close: 'Close'
+    footer:
+        disclaimer: 'This page has been created with services by OrbitronDev'
+service_index:
+    title: 'Index'
+    no_products: "There aren't any products"
+    comments: 'Comments'
+service_product:
+    title: 'Product'
+    pieces: 'Pieces'
+    available_stock: 'Available stock'
+    discount: 'Discount!'
+    comments: 'Comments'
+    comments_empty: "There aren't any comments. Be the first!"
+    stars: 'Stars'
+    time:
+        seconds_ago: 'second(s) ago'
+        minutes_ago: 'minute(s) ago'
+        hours_ago: 'hour(s) ago'
+        days_ago: 'day(s) ago'
+        months_ago: 'month(s) ago'
+        years_ago: 'year(s) ago'
+    form_cart:
+        product_count:
+            label: 'Amount'
+            constraints:
+                not_blank: 'Please enter a number'
+                not_an_int: 'The value {{ value }} is not a valid {{ type }}.'
+        send:
+            label: 'Add to shopping cart'
+    form_comment:
+        comment:
+            placeholder: 'Enter your review here...'
+            constraints:
+                not_blank: 'Please enter a message'
+        send:
+            label: 'Write a review'
+service_checkout:
+    title: 'Checkout'
+    voucher:
+        voucher: 'Voucher'
+        check: 'Check!'
+        valid: 'Valid code'
+        invalid: 'Invalid code'
+        type: 'Type:'
+        percentage: 'Percentage'
+        exact: 'Exact amount'
+        amount: 'Amount:'
+    shipping_method:
+        title: 'Shipping method'
+    payment_method:
+        no_method: 'No payment method has been created by the store owner'
+    cart:
+        title: 'Cart'
+        clear: 'Clear cart'
+        table:
+            product: 'Product'
+            quantity: 'Quantity'
+            price: 'Price'
+            total: 'Total'
+            status: 'Status:'
+            in_stock: 'In Stock'
+            remove: 'Remove'
+            subtotal: 'Subtotal'
+            shipping: 'Estimated shipping'
+        empty: 'Your cart is empty!'
+    form:
+        name:
+            label: 'Full name'
+            constraints:
+                not_blank: 'Please enter your full name'
+        email:
+            label: 'Email'
+            constraints:
+                not_blank: 'Please enter your email'
+        phone:
+            label: 'Phone Nr.'
+            constraints:
+                not_blank: 'Please enter your phone number'
+        location:
+            placeholder: 'Enter your address (Autocomplete)'
+        location_street:
+            label: 'Street'
+            constraints:
+                not_blank: 'Please enter your street'
+        location_street_number:
+            label: 'House Nr.'
+            constraints:
+                not_blank: 'Please enter your house nr.'
+        location_postal_code:
+            label: 'Postal code'
+            constraints:
+                not_blank: 'Please enter your zip code'
+        location_city:
+            label: 'City'
+            constraints:
+                not_blank: 'Please enter your city'
+        location_country:
+            label: 'Country'
+            constraints:
+                not_blank: 'Please enter your country'
+        send:
+            label: 'Order'

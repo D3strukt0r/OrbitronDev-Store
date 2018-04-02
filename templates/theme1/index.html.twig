@@ -1,0 +1,166 @@
+{% extends 'theme1/layout.html.twig' %}
+
+{% set service_page_links %}
+    {% for text,link in current_store.links %}
+        <li class="nav-item"><a href="{{ link }}" class="nav-link">{{ text }}</a></li>
+    {% endfor %}
+{% endset %}
+{% set service = {
+    'page_name': current_store.name,
+    'page_logo_link': '/' ~ current_store.url,
+    'page_author': current_store.owner.username,
+    'page_description': current_store.description,
+    'page_keywords': current_store.keywords|join(','),
+    'page_links': service_page_links,
+    'page_google_webdev': current_store.googleWebDeveloper,
+    'page_ga_id': current_store.googleAnalyticsId,
+    'page_logo_url': ''
+} %}
+{% set language = app.request.getLocale() %}
+{% set currency = app.session.get('_currency') %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /*.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }*/
+    </style>
+{% endblock %}
+
+{% block title %}{{ 'service_index.title'|trans }} | {{ service.page_name }}{% endblock %}
+
+{% block header %}
+    <div class="container">
+        <h1 class="mt-4 mb-2 pb-2 border-bottom">{{ current_store.name }}</h1>
+    </div>
+{% endblock %}
+
+{% block breadcrumb %}
+    <div class="container">
+        <div class="mb-2 pb-2 border-bottom">
+            <a class="btn btn-primary" href="{{ path('store_index', {'store': current_store.url}) }}" role="button">{{ 'service_general.nav.home'|trans }}</a>
+            <a class="btn btn-outline-primary" href="{{ path('store_checkout', {'store': current_store.url}) }}" role="button">{{ 'service_general.nav.checkout'|trans }}</a>
+
+            <div class="dropdown shopping-cart pull-right">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" style="padding: 5px 10px;">
+                    <i class="fa fa-shopping-cart fa-2x"></i>
+                    <span class="badge badge-secondary pull-right">{{ cart.system.total_count }}</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shopping-cart-open">
+                    <div class="products-list">
+                        <div class="mCustomScrollbar">
+                            {% if cart|length == 0 %}
+                                <span class="shc-title">{{ 'service_general.nav.cart_empty'|trans }}</span>
+                                <hr style="margin-bottom:0;margin-top:5px" />
+                            {% else %}
+                                {% for product in cart %}
+                                    {% if product.id != 0 %}
+                                        <div class="products">
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <img alt="" class="img-fluid img-tab-space" src="https://placehold.it/500x500{{ product.small_icon }}" />
+                                                </div>
+                                                <div class="col-8">
+                                                    <a href="{{ path('store_do_remove_from_cart', {'store': current_store.url, 'product': product.id}) }}" class="close" data-dismiss="alert" aria-hidden="true">×</a>
+                                                    <a class="product-link" href="{{ path('store_product', {'store': current_store.url, 'product': product.id}) }}">{{ product.name }}</a>
+                                                    <p class="products-price">{{ product.in_cart }} x {% if product.in_sale %}{{ product.price_sale|number_format(2, '.', '\'') }} {{ currency }}{% else %}{{ product.price|number_format(2, '.', '\'') }} {{ currency }}{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr style="margin-bottom:10px;margin-top:-25px" />
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="checkout-bottom">
+                        <a href="{{ path('store_checkout', {'store': current_store.url}) }}" class="btn btn-primary btn-xs"><i class="fa fa-shopping-cart"></i> {{ 'service_general.nav.checkout'|trans }}</a>
+                        <span class="shc-total">{{ 'service_general.nav.total'|trans }} <strong>{{ cart.system.total_price|number_format(2, '.', '\'') }} $</strong></span> {# TODO: Make this editable by the user #}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {# Check if there is a product which isn't closed #}
+            {% set counter = 0 %}
+            {% for product in product_list %}
+                {% if not product.closed %}
+                    {% set counter = counter + 1 %}
+                {% endif %}
+            {% endfor %}
+
+            {% if product_list|length == 0 or counter == 0 %}
+                <div class="col">
+                    <p class="text-center py-5 my-5"><b>{{ 'service_index.no_products'|trans }}</b></p>
+                </div>
+            {% else %}
+                {% for product in product_list %}
+                    {% if not product.closed %}
+                        <div class="col-sm-6 col-md-4 col-lg-4 mb-2">
+                            <div class="card">
+                                <a href="{{ path('store_product', {'store': current_store.url, 'product': product.id}) }}">
+                                    {# <img src="/img/store/' . $value['small_icon'] . '" title="' . $sName . '" /> #}{# TODO: Add product images #}
+                                    <img class="card-img-top" src="https://placehold.it/500x300" alt="">
+                                </a>
+                                <div class="card-body">
+                                    <h5 class="card-title">
+
+                                        <span class="pull-right">
+
+                                            {% if product.inSale(currency) %}
+                                            <span class="text-danger" style="margin-right: 10px"><b>{{ 'service_general.sale'|trans }}</b></span>
+                                            <br />
+                                            <del>
+                                                {% endif %}
+                                                <span id="output-price">
+                                            <b>
+                                                {% if product.price(currency) == 0 %}
+                                                    {{ 'service_general.free'|trans }}
+                                                {% else %}
+                                                    {{ product.price(currency)|number_format(2, '.', '\'') }} {{ currency }}
+                                                {% endif %}
+                                            </b>
+                                        </span>
+                                                {% if product.inSale(currency) %}
+                                            </del>
+                                        <br />
+                                            <span id="output-price-sale">
+                                                {% if product.salePrice(currency) == 0 %}
+                                                    <b>{{ 'service_general.free'|trans }}</b>
+                                                {% else %}
+                                                    <b>{{ product.salePrice(currency)|number_format(2, '.', '\'') }} {{ currency }}</b>
+                                                {% endif %}
+                                            </span>
+                                            {% endif %}
+                                        </span>
+                                        <span>
+                                            <a href="{{ path('store_product', {'store': current_store.url, 'product': product.id}) }}">{{ product.name(language) }}</a>
+                                            <br />
+                                            {% if product.stock == 0 %}
+                                                <span class="text-danger">{{ 'service_general.sold_out'|trans }}</span>
+                                            {% endif %}
+                                        </span>
+                                    </h5>
+                                    <p class="card-text">{{ product.shortDescription(language) }}</p>
+                                    <div>
+                                        <p class="pull-right">{{ product.ratingCount|number_format(0, '.', '\'') }} {{ 'service_index.comments'|trans }}</p>
+                                        <p>
+                                            {% for i in 1..5 %}<span class="fa fa-star{% if product.ratingAverage matches '/^[-+]?[0-9]*\\.?[0-9]+$/' and i > product.ratingAverage and i < (product.ratingAverage + 1) %}-half{% endif %}{% if i > product.ratingAverage %}-o{% endif %}"></span>&nbsp;{% endfor %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
