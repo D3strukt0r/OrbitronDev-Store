@@ -28,12 +28,15 @@ class LocaleSubscriber implements EventSubscriberInterface
         if ($locale = $request->attributes->get('_locale')) {
             $request->setLocale($locale);
             $request->attributes->set('set_locale_cookie', $locale);
+
         } elseif ($locale = $request->query->get('_locale')) {
             $request->setLocale($locale);
             $request->attributes->set('set_locale_cookie', $locale);
+
         } elseif ($locale = $request->cookies->get('_locale')) {
             $request->setLocale($locale);
             $request->attributes->set('set_locale_cookie', $locale);
+
         } else {
             // if no explicit locale has been set on this request, use one from the cookie
             $request->setLocale($request->cookies->get('_locale', $this->defaultLocale));
@@ -55,7 +58,7 @@ class LocaleSubscriber implements EventSubscriberInterface
     {
         return [
             // must be registered before (i.e. with a higher priority than) the default Locale listener
-            KernelEvents::REQUEST  => [['onKernelRequest', 20]],
+            KernelEvents::REQUEST => [['onKernelRequest', 20]],
             KernelEvents::RESPONSE => [['onKernelResponse', 0]],
         ];
     }
