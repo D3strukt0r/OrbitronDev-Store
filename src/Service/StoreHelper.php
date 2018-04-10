@@ -12,14 +12,14 @@ class StoreHelper
             'name' => [
                 'min_length' => 4,
             ],
-            'url'  => [
+            'url' => [
                 'min_length' => 3,
             ],
         ],
     ];
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager $em
+     * @var \Doctrine\Common\Persistence\ObjectManager
      */
     private $em;
 
@@ -29,7 +29,7 @@ class StoreHelper
     }
 
     /**
-     * Checks whether the given url exists, in other words, if the store exists
+     * Checks whether the given url exists, in other words, if the store exists.
      *
      * @param string $url
      *
@@ -40,11 +40,12 @@ class StoreHelper
         /** @var \App\Entity\Store[] $find */
         $find = $this->em->getRepository(Store::class)->findBy(['url' => $url]);
 
-        if (!is_null($find)) {
+        if (null !== $find) {
             if (count($find)) {
                 return true;
             }
         }
+
         return false;
     }
 }

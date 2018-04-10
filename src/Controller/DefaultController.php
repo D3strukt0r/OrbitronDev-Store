@@ -66,6 +66,7 @@ class DefaultController extends Controller
         $resourceOwner = $client->fetchUserFromToken($accessToken);
         $this->dataWasLoaded = true;
         $this->cachedData = $resourceOwner;
+
         return $resourceOwner;
     }
 
@@ -82,6 +83,7 @@ class DefaultController extends Controller
         if (!$this->dataWasLoaded) {
             $data = $this->getDataFromToken();
         }
+
         return array_key_exists($data, $this->cachedData);
     }
 
@@ -142,7 +144,7 @@ class DefaultController extends Controller
         //////////// TEST IF STORE EXISTS ////////////
         /** @var \App\Entity\Store $store */
         $store = $em->getRepository(Store::class)->findOneBy(['url' => $store]);
-        if (is_null($store)) {
+        if (null === $store) {
             throw $this->createNotFoundException();
         }
         //////////// END TEST IF STORE EXISTS ////////////
@@ -160,8 +162,8 @@ class DefaultController extends Controller
 
         return $this->render('theme1/index.html.twig', [
             'current_store' => $store,
-            'product_list'  => $list,
-            'cart'          => $cart,
+            'product_list' => $list,
+            'cart' => $cart,
         ]);
     }
 
@@ -170,7 +172,7 @@ class DefaultController extends Controller
         //////////// TEST IF STORE EXISTS ////////////
         /** @var null|\App\Entity\Store $store */
         $store = $em->getRepository(Store::class)->findOneBy(['url' => $store]);
-        if (is_null($store)) {
+        if (null === $store) {
             throw $this->createNotFoundException();
         }
         //////////// END TEST IF STORE EXISTS ////////////
@@ -178,7 +180,7 @@ class DefaultController extends Controller
         //////////// TEST IF PRODUCT EXISTS ////////////
         /** @var null|\App\Entity\Product $product */
         $product = $em->getRepository(Product::class)->findOneBy(['id' => $product]);
-        if (is_null($product)) {
+        if (null === $product) {
             throw $this->createNotFoundException();
         }
         //////////// END TEST IF PRODUCT EXISTS ////////////
@@ -189,7 +191,7 @@ class DefaultController extends Controller
         $cartHelper->initialise($store, $user);
 
         // Add product to cart
-        $addToCartForm = $this->createForm(AddToCartType::class, null, ['disable_fields' => $product->getStock() == 0 ? true : false]);
+        $addToCartForm = $this->createForm(AddToCartType::class, null, ['disable_fields' => 0 === $product->getStock() ? true : false]);
         $addToCartForm->handleRequest($request);
         if ($addToCartForm->isSubmitted() && $addToCartForm->isValid()) {
             $formData = $addToCartForm->getData();
@@ -232,10 +234,10 @@ class DefaultController extends Controller
             $count = 0;
             foreach ($product->getRatings() as $item) {
                 $totalStars += $item->getRating();
-                $count++;
+                ++$count;
             }
             $totalStars += $stars;
-            $count++;
+            ++$count;
 
             $average = round(($totalStars / $count) * 2) / 2;
             $product->setRatingAverage($average);
@@ -249,12 +251,12 @@ class DefaultController extends Controller
         $cart = $cartHelper->getCart(true, true);
 
         return $this->render('theme1/product.html.twig', [
-            'current_store'    => $store,
-            'current_product'  => $product,
-            'comments'         => $comments,
+            'current_store' => $store,
+            'current_product' => $product,
+            'comments' => $comments,
             'add_to_cart_form' => $addToCartForm->createView(),
             'add_comment_form' => $addCommentForm->createView(),
-            'cart'             => $cart,
+            'cart' => $cart,
         ]);
     }
 
@@ -263,7 +265,7 @@ class DefaultController extends Controller
         //////////// TEST IF STORE EXISTS ////////////
         /** @var \App\Entity\Store $store */
         $store = $em->getRepository(Store::class)->findOneBy(['url' => $store]);
-        if (is_null($store)) {
+        if (null === $store) {
             throw $this->createNotFoundException();
         }
         //////////// END TEST IF STORE EXISTS ////////////
@@ -275,15 +277,15 @@ class DefaultController extends Controller
         $cart = $cartHelper->getCart(true, false);
 
         $userData = $this->getDataFromToken(true);
-        $activeAddress = !is_null($userData) ? $userData->getActiveAddress() : null;
+        $activeAddress = null !== $userData ? $userData->getActiveAddress() : null;
         $checkoutFormData = [
-            'name'                   => (!is_null($userData) ? $userData->getFirstName() : '').' '.(!is_null($userData) ? $userData->getSurname() : ''),
-            'email'                  => !is_null($userData) ? $userData->getEmail() : '',
-            'location_street'        => !is_null($activeAddress) ? $activeAddress['street'] : '',
-            'location_street_number' => !is_null($activeAddress) ? $activeAddress['house_number'] : '',
-            'location_postal_code'   => !is_null($activeAddress) ? $activeAddress['zip_code'] : '',
-            'location_city'          => !is_null($activeAddress) ? $activeAddress['city'] : '',
-            'location_country'       => !is_null($activeAddress) ? $activeAddress['country'] : '',
+            'name' => (null !== $userData ? $userData->getFirstName() : '').' '.(null !== $userData ? $userData->getSurname() : ''),
+            'email' => null !== $userData ? $userData->getEmail() : '',
+            'location_street' => null !== $activeAddress ? $activeAddress['street'] : '',
+            'location_street_number' => null !== $activeAddress ? $activeAddress['house_number'] : '',
+            'location_postal_code' => null !== $activeAddress ? $activeAddress['zip_code'] : '',
+            'location_city' => null !== $activeAddress ? $activeAddress['city'] : '',
+            'location_country' => null !== $activeAddress ? $activeAddress['country'] : '',
         ];
         $checkoutForm = $this->createForm(CheckoutType::class, null, $checkoutFormData);
 
@@ -293,25 +295,25 @@ class DefaultController extends Controller
         $payment = null;
         if (count($paymentTypes) > 0) {
             foreach ($paymentTypes as $type) {
-                if ($type->getId() != $store->getActivePaymentMethod()) {
+                if ($type->getId() !== $store->getActivePaymentMethod()) {
                     continue;
                 }
                 $payment = [];
                 $payment['method'] = $type;
-                if ($type->getType() == StorePaymentMethods::TYPE_BRAINTREE_PRODUCTION) {
+                if (StorePaymentMethods::TYPE_BRAINTREE_PRODUCTION === $type->getType()) {
                     $payment['gateway'] = new Gateway([
                         'environment' => 'production',
-                        'merchantId'  => $type->getData()['merchant_id'],
-                        'publicKey'   => $type->getData()['public_key'],
-                        'privateKey'  => $type->getData()['private_key'],
+                        'merchantId' => $type->getData()['merchant_id'],
+                        'publicKey' => $type->getData()['public_key'],
+                        'privateKey' => $type->getData()['private_key'],
                     ]);
                     $payment['client_token'] = $payment['gateway']->clientToken()->generate();
-                } elseif ($type->getType() == StorePaymentMethods::TYPE_BRAINTREE_SANDBOX) {
+                } elseif (StorePaymentMethods::TYPE_BRAINTREE_SANDBOX === $type->getType()) {
                     $payment['gateway'] = new Gateway([
                         'environment' => 'sandbox',
-                        'merchantId'  => $type->getData()['merchant_id'],
-                        'publicKey'   => $type->getData()['public_key'],
-                        'privateKey'  => $type->getData()['private_key'],
+                        'merchantId' => $type->getData()['merchant_id'],
+                        'publicKey' => $type->getData()['public_key'],
+                        'privateKey' => $type->getData()['private_key'],
                     ]);
                     $payment['client_token'] = $payment['gateway']->clientToken()->generate();
                 }
@@ -346,19 +348,18 @@ class DefaultController extends Controller
                     $this->addFlash('products_unavailable', $item['name'].' has only '.$item['stock_available'].' left! You wanted '.$item['count']); // TODO: Missing translation
                 }
             } else {
-
                 $cart2 = $cartHelper->getCart(true, true);
                 $paymentSuccessful = false;
 
-                if ($payment['method']->getType() == StorePaymentMethods::TYPE_BRAINTREE_PRODUCTION || $payment['method']->getType() == StorePaymentMethods::TYPE_BRAINTREE_SANDBOX) {
+                if (StorePaymentMethods::TYPE_BRAINTREE_PRODUCTION === $payment['method']->getType() || StorePaymentMethods::TYPE_BRAINTREE_SANDBOX === $payment['method']->getType()) {
                     $result = $payment['gateway']->transaction()->sale([
-                        'amount'             => $cart2['system']['total_price'],
+                        'amount' => $cart2['system']['total_price'],
                         'paymentMethodNonce' => $nonceFromTheClient,
-                        'options'            => [
+                        'options' => [
                             'submitForSettlement' => true,
                         ],
                     ]);
-                    if ($result->success === true) {
+                    if (true === $result->success) {
                         $paymentSuccessful = true;
                     }
                 }
@@ -374,10 +375,10 @@ class DefaultController extends Controller
                     $imgDir1 = $message->embed(Swift_Image::fromPath($this->get('kernel')->getProjectDir().'/web/img/logo-long.png'));
                     $message->setBody($this->renderView('mail/order-confirmation.html.twig', [
                             'current_store' => $store,
-                            'order_form'    => $formData,
-                            'header_image'  => $imgDir1,
-                            'ordered_time'  => time(),
-                            'cart'          => $cart,
+                            'order_form' => $formData,
+                            'header_image' => $imgDir1,
+                            'ordered_time' => time(),
+                            'cart' => $cart,
                         ]), 'text/html');
 
                     /** @var \Swift_Mailer $mailer */
@@ -405,11 +406,11 @@ class DefaultController extends Controller
         $deliveryType = $em->getRepository(DeliveryType::class)->findBy(['store' => $store]);
 
         return $this->render('theme1/checkout.html.twig', [
-            'current_store'  => $store,
-            'checkout_form'  => $checkoutForm->createView(),
+            'current_store' => $store,
+            'checkout_form' => $checkoutForm->createView(),
             'delivery_types' => $deliveryType,
-            'cart'           => $cart,
-            'payment'        => $payment,
+            'cart' => $cart,
+            'payment' => $payment,
         ]);
     }
 
@@ -418,7 +419,7 @@ class DefaultController extends Controller
         //////////// TEST IF STORE EXISTS ////////////
         /** @var \App\Entity\Store $store */
         $store = $em->getRepository(Store::class)->findOneBy(['url' => $store]);
-        if (is_null($store)) {
+        if (null === $store) {
             throw $this->createNotFoundException();
         }
         //////////// END TEST IF STORE EXISTS ////////////
@@ -427,7 +428,7 @@ class DefaultController extends Controller
         $voucher = $em->getRepository(Voucher::class)->findOneBy(['store' => $store, 'code' => $request->query->get('code')]);
 
         $result = new \SimpleXMLElement('<root></root>');
-        if (is_null($voucher)) {
+        if (null === $voucher) {
             $result->addChild('result', 'invalid');
         } else {
             $result->addChild('result', 'valid');
@@ -446,7 +447,7 @@ class DefaultController extends Controller
         //////////// TEST IF STORE EXISTS ////////////
         /** @var \App\Entity\Store $store */
         $store = $em->getRepository(Store::class)->findOneBy(['url' => $store]);
-        if (is_null($store)) {
+        if (null === $store) {
             throw $this->createNotFoundException();
         }
         //////////// END TEST IF STORE EXISTS ////////////
@@ -465,7 +466,7 @@ class DefaultController extends Controller
         //////////// TEST IF STORE EXISTS ////////////
         /** @var \App\Entity\Store $store */
         $store = $em->getRepository(Store::class)->findOneBy(['url' => $store]);
-        if (is_null($store)) {
+        if (null === $store) {
             throw $this->createNotFoundException();
         }
         //////////// END TEST IF STORE EXISTS ////////////
@@ -481,18 +482,18 @@ class DefaultController extends Controller
         $cartHelper->addToCart($product, $count);
 
         $browser = $request->get('browser', null);
-        if (!is_null($responseType)) {
-            if ($responseType == 'json') {
+        if (null !== $responseType) {
+            if ('json' === $responseType) {
                 return $this->json([
                     'result' => 'true',
                 ]);
             }
         }
-        if (is_null($browser) || (!is_null($browser) && $browser == true)) {
+        if (null === $browser || (null !== $browser && true === $browser)) {
             return $this->redirect($request->server->get('HTTP_REFERER'), 302);
-        } else {
-            return '';
         }
+
+        return '';
     }
 
     public function storeDoRemoveFromCart(ObjectManager $em, Request $request, CartHelper $cartHelper, $store)
@@ -500,7 +501,7 @@ class DefaultController extends Controller
         //////////// TEST IF STORE EXISTS ////////////
         /** @var \App\Entity\Store $store */
         $store = $em->getRepository(Store::class)->findOneBy(['url' => $store]);
-        if (is_null($store)) {
+        if (null === $store) {
             throw $this->createNotFoundException();
         }
         //////////// END TEST IF STORE EXISTS ////////////
@@ -516,18 +517,18 @@ class DefaultController extends Controller
         $cartHelper->removeFromCart($product, $count);
 
         $browser = $request->get('browser', null);
-        if (!is_null($responseType)) {
-            if ($responseType == 'json') {
+        if (null !== $responseType) {
+            if ('json' === $responseType) {
                 return $this->json([
-                    'result' => "true",
+                    'result' => 'true',
                 ]);
             }
         }
-        if (is_null($browser) || (!is_null($browser) && $browser == true)) {
+        if (null === $browser || (null !== $browser && true === $browser)) {
             return $this->redirect($request->server->get('HTTP_REFERER'), 302);
-        } else {
-            return '';
         }
+
+        return '';
     }
 
     public function storeAdmin(ObjectManager $em, Request $request, $store, $page)
@@ -543,12 +544,12 @@ class DefaultController extends Controller
         //////////// TEST IF STORE EXISTS ////////////
         /** @var \App\Entity\Store|null $store */
         $store = $em->getRepository(Store::class)->findOneBy(['url' => $store]);
-        if (is_null($store)) {
+        if (null === $store) {
             throw $this->createNotFoundException();
         }
         //////////// END TEST IF STORE EXISTS ////////////
 
-        if ($user->getId() != $store->getOwner()->getId()) {
+        if ($user->getId() !== $store->getOwner()->getId()) {
             throw $this->createAccessDeniedException();
         }
 
@@ -568,16 +569,17 @@ class DefaultController extends Controller
             next($list);
         }
 
-        if (!is_null($key)) {
+        if (null !== $key) {
             if (is_callable('\\App\\Controller\\Panel\\'.$list[$key]['view'])) {
                 $view = $list[$key]['view'];
             }
         }
         $response = $this->forward('App\\Controller\\Panel\\'.$view, [
             'navigation' => $navigationLinks,
-            'request'    => $request,
-            'store'      => $store,
+            'request' => $request,
+            'store' => $store,
         ]);
+
         return $response;
     }
 }

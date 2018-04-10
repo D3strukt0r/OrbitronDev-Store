@@ -46,13 +46,13 @@ class ProductRating
 
     /**
      * @var bool
-     * @ORM\Column(type="boolean", options={"default":true})
+     * @ORM\Column(type="boolean", options={"default": true})
      */
     protected $approved = true;
 
     /**
      * @var bool
-     * @ORM\Column(type="boolean", options={"default":false})
+     * @ORM\Column(type="boolean", options={"default": false})
      */
     protected $spam = false;
 

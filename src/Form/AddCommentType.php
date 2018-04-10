@@ -18,7 +18,7 @@ class AddCommentType extends AbstractType
                 'data' => 0,
             ])
             ->add('comment', TextareaType::class, [
-                'attr'        => [
+                'attr' => [
                     'placeholder' => 'service_product.form_comment.comment.placeholder',
                 ],
                 'constraints' => [

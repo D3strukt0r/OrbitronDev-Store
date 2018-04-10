@@ -77,7 +77,7 @@ class Product
 
     /**
      * @var bool
-     * @ORM\Column(type="boolean", options={"default":false})
+     * @ORM\Column(type="boolean", options={"default": false})
      */
     protected $downloadable = false;
 
@@ -89,7 +89,7 @@ class Product
 
     /**
      * @var int
-     * @ORM\Column(type="integer", options={"default":0})
+     * @ORM\Column(type="integer", options={"default": 0})
      */
     protected $stock = 0;
 
@@ -101,19 +101,19 @@ class Product
 
     /**
      * @var bool
-     * @ORM\Column(type="boolean", options={"default":false})
+     * @ORM\Column(type="boolean", options={"default": false})
      */
     protected $closed = false;
 
     /**
      * @var int
-     * @ORM\Column(type="integer", options={"default":0})
+     * @ORM\Column(type="integer", options={"default": 0})
      */
     protected $rating_count = 0;
 
     /**
      * @var float
-     * @ORM\Column(type="decimal", options={"default":0})
+     * @ORM\Column(type="decimal", options={"default": 0})
      */
     protected $rating_average = 0;
 
@@ -193,6 +193,7 @@ class Product
         if ($array->containsKey($this->getDefaultLanguage())) {
             return $array->get($this->getDefaultLanguage());
         }
+
         return null;
     }
 
@@ -257,6 +258,7 @@ class Product
         if ($array->containsKey($this->getDefaultLanguage())) {
             return $array->get($this->getDefaultLanguage());
         }
+
         return null;
     }
 
@@ -321,6 +323,7 @@ class Product
         if ($array->containsKey($this->getDefaultLanguage())) {
             return $array->get($this->getDefaultLanguage());
         }
+
         return null;
     }
 
@@ -385,6 +388,7 @@ class Product
         if ($array->containsKey($this->getDefaultCurrency())) {
             return $array->get($this->getDefaultCurrency());
         }
+
         return null;
     }
 
@@ -449,6 +453,7 @@ class Product
         if ($array->containsKey($this->getDefaultCurrency())) {
             return $array->get($this->getDefaultCurrency());
         }
+
         return null;
     }
 
@@ -467,12 +472,13 @@ class Product
      */
     public function isInSale(string $currency): bool
     {
-        if (!is_null($this->price_sale)) {
+        if (null !== $this->price_sale) {
             $array = new ArrayCollection($this->price_sale);
             if ($array->containsKey($currency)) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -782,24 +788,24 @@ class Product
     public function toArray(): array
     {
         return [
-            'id'                => $this->id,
-            'store'             => $this->store,
-            'owner'             => $this->owner,
-            'name'              => $this->name,
-            'description'       => $this->description,
+            'id' => $this->id,
+            'store' => $this->store,
+            'owner' => $this->owner,
+            'name' => $this->name,
+            'description' => $this->description,
             'short_description' => $this->short_description,
-            'price'             => $this->price,
-            'price_sale'        => $this->price_sale,
-            'small_icon'        => $this->small_icon,
-            'images'            => $this->images,
-            'downloadable'      => $this->downloadable,
-            'files'             => $this->files,
-            'stock'             => $this->stock,
-            'last_edited'       => $this->last_edited,
-            'closed'            => $this->closed,
-            'rating_count'      => $this->rating_count,
-            'rating_average'    => $this->rating_average,
-            'ratings'           => $this->ratings,
+            'price' => $this->price,
+            'price_sale' => $this->price_sale,
+            'small_icon' => $this->small_icon,
+            'images' => $this->images,
+            'downloadable' => $this->downloadable,
+            'files' => $this->files,
+            'stock' => $this->stock,
+            'last_edited' => $this->last_edited,
+            'closed' => $this->closed,
+            'rating_count' => $this->rating_count,
+            'rating_average' => $this->rating_average,
+            'ratings' => $this->ratings,
         ];
     }
 }

@@ -10,27 +10,27 @@ class ModeratorController extends Controller
     {
         return [
             [
-                'type'   => 'group',
+                'type' => 'group',
                 'parent' => 'root',
-                'id'     => 'moderator',
-                'title'  => 'Moderator',
-                'icon'   => 'hs-admin-brush-alt',
+                'id' => 'moderator',
+                'title' => 'Moderator',
+                'icon' => 'hs-admin-brush-alt',
             ],
             [
-                'type'   => 'link',
+                'type' => 'link',
                 'parent' => 'moderator',
-                'id'     => 'advertisement',
-                'title'  => 'Advertisement',
-                'href'   => 'advertisement',
-                'view'   => 'ModeratorController::advertisement',
+                'id' => 'advertisement',
+                'title' => 'Advertisement',
+                'href' => 'advertisement',
+                'view' => 'ModeratorController::advertisement',
             ],
             [
-                'type'   => 'link',
+                'type' => 'link',
                 'parent' => 'moderator',
-                'id'     => 'mod_tools',
-                'title'  => 'Mod tools',
-                'href'   => 'mod-tools',
-                'view'   => 'ModeratorController::modTools',
+                'id' => 'mod_tools',
+                'title' => 'Mod tools',
+                'href' => 'mod-tools',
+                'view' => 'ModeratorController::modTools',
             ],
         ];
     }
@@ -44,7 +44,7 @@ class ModeratorController extends Controller
     {
         return $response = $this->forward('App\\Controller\\Panel\\DefaultController::notFound', [
             'navigation' => $navigation,
-            'store'      => $store,
+            'store' => $store,
         ]);
     }
 
@@ -52,7 +52,7 @@ class ModeratorController extends Controller
     {
         return $response = $this->forward('App\\Controller\\Panel\\DefaultController::notFound', [
             'navigation' => $navigation,
-            'store'      => $store,
+            'store' => $store,
         ]);
     }
 }

@@ -17,17 +17,17 @@ class CartHelper
     private $initialised = false;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager $em
+     * @var \Doctrine\Common\Persistence\ObjectManager
      */
     private $em;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request $request
+     * @var \Symfony\Component\HttpFoundation\Request
      */
     private $request;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\SessionInterface $session
+     * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
      */
     private $session;
 
@@ -59,7 +59,7 @@ class CartHelper
     }
 
     /**
-     * Obligatory to add additional information, as it's impossible to add this through the service injector
+     * Obligatory to add additional information, as it's impossible to add this through the service injector.
      *
      * @param \App\Entity\Store     $store
      * @param \App\Entity\User|null $user
@@ -71,7 +71,7 @@ class CartHelper
         $this->initialised = true;
 
         // If user exists (logged in)
-        if (!is_null($this->user)) {
+        if (null !== $this->user) {
             /** @var \App\Entity\Cart|null $cart */
             $cart = $this->em->getRepository(Cart::class)->findOneBy(['store' => $this->store, 'user' => $this->user]);
         } else {
@@ -80,12 +80,12 @@ class CartHelper
             $id = $this->store->getId();
             $cart = $this->em->getRepository(Cart::class)->findOneBy([
                 'store' => $this->store,
-                'id'    => $this->session->get("cart[$id]"),
+                'id' => $this->session->get("cart[$id]"),
             ]);
         }
 
         // If cart exists
-        if (!is_null($cart)) {
+        if (null !== $cart) {
             $this->cart = $cart;
         } else { // If cart doesn't exist (not created yet)
             $this->createNewCart();
@@ -93,7 +93,7 @@ class CartHelper
     }
 
     /**
-     * Creates a new cart in the database
+     * Creates a new cart in the database.
      */
     private function createNewCart(): void
     {
@@ -109,7 +109,7 @@ class CartHelper
         $this->em->persist($newCart);
         $this->em->flush();
 
-        if (is_null($this->user)) {
+        if (null === $this->user) {
             $id = $this->session->getId();
             $this->session->set("cart[$id]", $newCart->getId());
         }
@@ -118,7 +118,7 @@ class CartHelper
     }
 
     /**
-     * Clears the cart
+     * Clears the cart.
      */
     public function clearCart(): void
     {
@@ -131,7 +131,7 @@ class CartHelper
     }
 
     /**
-     * Add a product to the cart
+     * Add a product to the cart.
      *
      * @param \App\Entity\Product $product (Required) to know which product
      * @param int                 $count   (Optional) Amount to be added
@@ -159,7 +159,7 @@ class CartHelper
     }
 
     /**
-     * Remove a product from the cart
+     * Remove a product from the cart.
      *
      * @param \App\Entity\Product $product (Required) to know which product
      * @param null                $count   (Optional) Amount to be removed
@@ -173,7 +173,7 @@ class CartHelper
         $products = $this->cart->getProducts();
 
         if (isset($products[$product->getId()])) {
-            if ((!is_null($count) || $count > 0) && $products[$product->getId()]['count'] > $count) {
+            if ((null !== $count || $count > 0) && $products[$product->getId()]['count'] > $count) {
                 // Only remove the amount
                 $products[$product->getId()]['count'] -= $count;
             } else {
@@ -199,21 +199,21 @@ class CartHelper
 
         $products = $this->cart->getProducts();
 
-        if (count($products) == 0) {
+        if (0 === count($products)) {
             if ($add_total) {
                 return [
                     'system' => [
-                        'id'          => 0, // Needed, so it won't be displayed in the checkout
+                        'id' => 0, // Needed, so it won't be displayed in the checkout
                         'total_count' => 0,
                         'total_price' => 0,
                     ],
                 ];
             }
+
             return [];
         }
 
         if ($additional_info) {
-
             $totalCount = 0;
             $totalPrice = 0;
 

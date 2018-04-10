@@ -9,12 +9,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class CronJobHelper
 {
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager $em
+     * @var \Doctrine\Common\Persistence\ObjectManager
      */
     private $em;
 
     /**
-     * @var \Symfony\Component\HttpKernel\KernelInterface $kernel
+     * @var \Symfony\Component\HttpKernel\KernelInterface
      */
     private $kernel;
 
@@ -40,7 +40,7 @@ class CronJobHelper
     /**
      * @param \App\Entity\CronJob $job
      *
-     * @return integer
+     * @return int
      */
     public function getNextExec(CronJob $job)
     {

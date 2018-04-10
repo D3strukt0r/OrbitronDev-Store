@@ -112,8 +112,8 @@ class Cart
     public function toArray(): array
     {
         return [
-            'id'       => $this->id,
-            'user'     => $this->user,
+            'id' => $this->id,
+            'user' => $this->user,
             'products' => $this->products,
         ];
     }

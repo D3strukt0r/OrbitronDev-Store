@@ -18,67 +18,67 @@ class ShopController extends Controller
     {
         return [
             [
-                'type'   => 'group',
+                'type' => 'group',
                 'parent' => 'root',
-                'id'     => 'shop',
-                'title'  => 'Shop',
-                'icon'   => 'hs-admin-shopping-cart',
+                'id' => 'shop',
+                'title' => 'Shop',
+                'icon' => 'hs-admin-shopping-cart',
             ],
             [
-                'type'   => 'link',
+                'type' => 'link',
                 'parent' => 'shop',
-                'id'     => 'catalogue',
-                'title'  => 'Catalogue/Products',
-                'href'   => 'catalogue',
-                'view'   => 'ShopController::catalogue',
+                'id' => 'catalogue',
+                'title' => 'Catalogue/Products',
+                'href' => 'catalogue',
+                'view' => 'ShopController::catalogue',
             ],
             [
-                'type'   => 'link',
+                'type' => 'link',
                 'parent' => 'null',
-                'id'     => 'create_product',
-                'title'  => 'Create product',
-                'href'   => 'create-product',
-                'view'   => 'ShopController::createProduct',
+                'id' => 'create_product',
+                'title' => 'Create product',
+                'href' => 'create-product',
+                'view' => 'ShopController::createProduct',
             ],
             [
-                'type'   => 'link',
+                'type' => 'link',
                 'parent' => 'shop',
-                'id'     => 'orders',
-                'title'  => 'Orders',
-                'href'   => 'orders',
-                'view'   => 'ShopController::orders',
+                'id' => 'orders',
+                'title' => 'Orders',
+                'href' => 'orders',
+                'view' => 'ShopController::orders',
             ],
             [
-                'type'   => 'link',
+                'type' => 'link',
                 'parent' => 'null',
-                'id'     => 'state_1',
-                'title'  => 'Change to sent',
-                'href'   => 'change_order_statement_to_1',
-                'view'   => 'ShopController::changeOrderStatusTo1',
+                'id' => 'state_1',
+                'title' => 'Change to sent',
+                'href' => 'change_order_statement_to_1',
+                'view' => 'ShopController::changeOrderStatusTo1',
             ],
             [
-                'type'   => 'link',
+                'type' => 'link',
                 'parent' => 'null',
-                'id'     => 'state_2',
-                'title'  => 'Change to Processed',
-                'href'   => 'change_order_statement_to_2',
-                'view'   => 'ShopController::changeOrderStatusTo2',
+                'id' => 'state_2',
+                'title' => 'Change to Processed',
+                'href' => 'change_order_statement_to_2',
+                'view' => 'ShopController::changeOrderStatusTo2',
             ],
             [
-                'type'   => 'link',
+                'type' => 'link',
                 'parent' => 'shop',
-                'id'     => 'vouchers',
-                'title'  => 'Vouchers',
-                'href'   => 'vouchers',
-                'view'   => 'ShopController::vouchers',
+                'id' => 'vouchers',
+                'title' => 'Vouchers',
+                'href' => 'vouchers',
+                'view' => 'ShopController::vouchers',
             ],
             [
-                'type'   => 'link',
+                'type' => 'link',
                 'parent' => 'null',
-                'id'     => 'create_voucher',
-                'title'  => 'Create voucher',
-                'href'   => 'create-voucher',
-                'view'   => 'ShopController::createVoucher',
+                'id' => 'create_voucher',
+                'title' => 'Create voucher',
+                'href' => 'create-voucher',
+                'view' => 'ShopController::createVoucher',
             ],
         ];
     }
@@ -93,15 +93,15 @@ class ShopController extends Controller
         /** @var \App\Entity\Product[] $productList */
         $productList = $em->getRepository(Product::class)->findBy(['store' => $store], ['last_edited' => 'DESC']);
 
-        $userLanguage = !is_null($request->query->get('lang')) ? $request->query->get('lang') : 'en';
-        $userCurrency = !is_null($request->query->get('currency')) ? $request->query->get('currency') : 'USD';
+        $userLanguage = null !== $request->query->get('lang') ? $request->query->get('lang') : 'en';
+        $userCurrency = null !== $request->query->get('currency') ? $request->query->get('currency') : 'USD';
 
         return $this->render('theme_admin1/catalogue.html.twig', [
             'navigation_links' => $navigation,
-            'current_store'    => $store,
-            'products'         => $productList,
-            'language'         => $userLanguage,
-            'currency'         => $userCurrency,
+            'current_store' => $store,
+            'products' => $productList,
+            'language' => $userLanguage,
+            'currency' => $userCurrency,
         ]);
     }
 
@@ -126,10 +126,10 @@ class ShopController extends Controller
                 ->setName($formData['name'], $store->getDefaultLanguage())
                 ->setDescription($formData['description'], $store->getDefaultLanguage())
                 ->setShortDescription($formData['short_description'], $store->getDefaultLanguage())
-                ->setPrice(floatval($formData['price']), $store->getDefaultCurrency())
-                ->setStock(intval($formData['stock']));
-            if (!is_null($formData['sale_price'])) {
-                $product->setSalePrice(floatval($formData['sale_price']), $store->getDefaultCurrency());
+                ->setPrice((float) ($formData['price']), $store->getDefaultCurrency())
+                ->setStock((int) ($formData['stock']));
+            if (null !== $formData['sale_price']) {
+                $product->setSalePrice((float) ($formData['sale_price']), $store->getDefaultCurrency());
             }
             $em->persist($product);
             $em->flush();
@@ -140,7 +140,7 @@ class ShopController extends Controller
 
         return $this->render('theme_admin1/create_product.html.twig', [
             'navigation_links' => $navigation,
-            'current_store'    => $store,
+            'current_store' => $store,
             'add_product_form' => $addProductForm->createView(),
         ]);
     }
@@ -170,16 +170,15 @@ class ShopController extends Controller
             }
             $ordersData[$index] = $productList;
             // TODO: Format delivery type
-
         }
 
         return $this->render('theme_admin1/orders.html.twig', [
             'navigation_links' => $navigation,
-            'current_store'    => $store,
-            'orders'           => $orders,
-            'orders_data'      => $ordersData,
-            'language'         => $userLanguage,
-            'currency'         => $userCurrency,
+            'current_store' => $store,
+            'orders' => $orders,
+            'orders_data' => $ordersData,
+            'language' => $userLanguage,
+            'currency' => $userCurrency,
         ]);
     }
 
@@ -190,8 +189,8 @@ class ShopController extends Controller
 
         return $this->render('theme_admin1/vouchers.html.twig', [
             'navigation_links' => $navigation,
-            'current_store'    => $store,
-            'vouchers'         => $vouchers,
+            'current_store' => $store,
+            'vouchers' => $vouchers,
         ]);
     }
 
@@ -224,7 +223,7 @@ class ShopController extends Controller
 
         return $this->render('theme_admin1/create_voucher.html.twig', [
             'navigation_links' => $navigation,
-            'current_store'    => $store,
+            'current_store' => $store,
             'add_voucher_form' => $addVoucherForm->createView(),
         ]);
     }
@@ -239,7 +238,7 @@ class ShopController extends Controller
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        if ($user instanceof UserInterface && $store->getOwner()->getId() == $user->getId()) {
+        if ($user instanceof UserInterface && $store->getOwner()->getId() === $user->getId()) {
             /** @var \App\Entity\Order $update */
             $update = $em->getRepository(Order::class)->findOneBy(['id' => $request->query->get('order_id')]);
             $update->setStatus(Order::STATUS_IN_PRODUCTION);
@@ -260,7 +259,7 @@ class ShopController extends Controller
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        if ($user instanceof UserInterface && $store->getOwner()->getId() == $user->getId()) {
+        if ($user instanceof UserInterface && $store->getOwner()->getId() === $user->getId()) {
             /** @var \App\Entity\Order $update */
             $update = $em->getRepository(Order::class)->findOneBy(['id' => $request->query->get('order_id')]);
             $update->setStatus(Order::STATUS_SENT);

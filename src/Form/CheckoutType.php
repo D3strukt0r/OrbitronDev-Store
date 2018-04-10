@@ -15,8 +15,8 @@ class CheckoutType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label'       => 'service_checkout.form.name.label',
-                'attr'        => [
+                'label' => 'service_checkout.form.name.label',
+                'attr' => [
                     'value' => $options['name'],
                 ],
                 'constraints' => [
@@ -24,8 +24,8 @@ class CheckoutType extends AbstractType
                 ],
             ])
             ->add('email', TextType::class, [
-                'label'       => 'service_checkout.form.email.label',
-                'attr'        => [
+                'label' => 'service_checkout.form.email.label',
+                'attr' => [
                     'value' => $options['email'],
                 ],
                 'constraints' => [
@@ -33,14 +33,14 @@ class CheckoutType extends AbstractType
                 ],
             ])
             ->add('phone', TextType::class, [
-                'label'       => 'service_checkout.form.phone.label',
+                'label' => 'service_checkout.form.phone.label',
                 'constraints' => [
                     new NotBlank(['message' => 'service_checkout.form.phone.constraints.not_blank']),
                 ],
             ])
             ->add('location_street', TextType::class, [
-                'label'       => 'service_checkout.form.location_street.label',
-                'attr'        => [
+                'label' => 'service_checkout.form.location_street.label',
+                'attr' => [
                     'value' => $options['location_street'],
                 ],
                 'constraints' => [
@@ -48,8 +48,8 @@ class CheckoutType extends AbstractType
                 ],
             ])
             ->add('location_street_number', TextType::class, [
-                'label'       => 'service_checkout.form.location_street_number.label',
-                'attr'        => [
+                'label' => 'service_checkout.form.location_street_number.label',
+                'attr' => [
                     'value' => $options['location_street_number'],
                 ],
                 'constraints' => [
@@ -57,8 +57,8 @@ class CheckoutType extends AbstractType
                 ],
             ])
             ->add('location_postal_code', TextType::class, [
-                'label'       => 'service_checkout.form.location_postal_code.label',
-                'attr'        => [
+                'label' => 'service_checkout.form.location_postal_code.label',
+                'attr' => [
                     'value' => $options['location_postal_code'],
                 ],
                 'constraints' => [
@@ -66,8 +66,8 @@ class CheckoutType extends AbstractType
                 ],
             ])
             ->add('location_city', TextType::class, [
-                'label'       => 'service_checkout.form.location_city.label',
-                'attr'        => [
+                'label' => 'service_checkout.form.location_city.label',
+                'attr' => [
                     'value' => $options['location_city'],
                 ],
                 'constraints' => [
@@ -75,8 +75,8 @@ class CheckoutType extends AbstractType
                 ],
             ])
             ->add('location_country', TextType::class, [
-                'label'       => 'service_checkout.form.location_country.label',
-                'attr'        => [
+                'label' => 'service_checkout.form.location_country.label',
+                'attr' => [
                     'value' => $options['location_country'],
                 ],
                 'constraints' => [
@@ -94,13 +94,13 @@ class CheckoutType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'name'                   => '',
-            'email'                  => '',
-            'location_street'        => '',
+            'name' => '',
+            'email' => '',
+            'location_street' => '',
             'location_street_number' => '',
-            'location_postal_code'   => '',
-            'location_city'          => '',
-            'location_country'       => '',
+            'location_postal_code' => '',
+            'location_city' => '',
+            'location_country' => '',
         ]);
     }
 }

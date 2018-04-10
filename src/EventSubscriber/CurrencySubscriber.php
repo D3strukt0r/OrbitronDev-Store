@@ -2,11 +2,11 @@
 
 namespace App\EventSubscriber;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CurrencySubscriber implements EventSubscriberInterface
 {
@@ -54,7 +54,7 @@ class CurrencySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::REQUEST  => [['onKernelRequest', 0]],
+            KernelEvents::REQUEST => [['onKernelRequest', 0]],
             KernelEvents::RESPONSE => [['onKernelResponse', 0]],
         ];
     }

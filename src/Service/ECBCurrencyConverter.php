@@ -50,12 +50,12 @@ class ECBCurrencyConverter
     private $sCachedFile = '/var/data/currency/currency-data.xml';
 
     /**
-     * @var \Symfony\Component\Translation\TranslatorInterface $translator
+     * @var \Symfony\Component\Translation\TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var \Symfony\Component\HttpKernel\KernelInterface $kernel
+     * @var \Symfony\Component\HttpKernel\KernelInterface
      */
     private $kernel;
 
@@ -70,6 +70,7 @@ class ECBCurrencyConverter
     {
         if (!file_exists($this->sCachedFile)) {
             $this->download($this->sCachedFile);
+
             return true;
         }
 
@@ -78,8 +79,10 @@ class ECBCurrencyConverter
 
         if ($oCurrencyDataLocal->Cube->Cube['time'] !== $oCurrencyDataHosted->Cube->Cube['time']) {
             $this->download($this->sCachedFile);
+
             return true;
         }
+
         return false;
     }
 
@@ -102,21 +105,22 @@ class ECBCurrencyConverter
     {
         $oXmlFile = simplexml_load_file($this->sCachedFile);
         foreach ($oXmlFile->Cube->Cube->Cube as $aRate) {
-            if (strtoupper($currency) == strtoupper($aRate['currency'])) {
-                return (float)$aRate['rate'];
+            if (mb_strtoupper($currency) === mb_strtoupper($aRate['currency'])) {
+                return (float) $aRate['rate'];
             }
         }
+
         return 'currency_does_not_exists';
     }
 
     /**
      * Perform the actual conversion
-     * Hint: Base is EUR, so everything is converted to EUR and then to the given currency
+     * Hint: Base is EUR, so everything is converted to EUR and then to the given currency.
      *
-     * @param float  $amount   (Required) How much should be converted.
-     * @param string $from     (Required) From which currency should be converted.
+     * @param float  $amount   (Required) How much should be converted
+     * @param string $from     (Required) From which currency should be converted
      * @param string $to       (Optional) To which currency should be converted. Default is USD.
-     * @param int    $decimals (Optional) How much decimals should the number have.
+     * @param int    $decimals (Optional) How much decimals should the number have
      *
      * @return float
      */
@@ -126,14 +130,15 @@ class ECBCurrencyConverter
             self::download($this->sCachedFile);
         }
 
-        if ($this->getRate($from) == 'currency_does_not_exists' || (strtoupper($to) != 'EUR' && $this->getRate($to) == 'currency_does_not_exists')) {
+        if ('currency_does_not_exists' === $this->getRate($from) || ('EUR' !== mb_strtoupper($to) && 'currency_does_not_exists' === $this->getRate($to))) {
             return $this->translator->trans('Currency not found');
         }
 
         $currency = $amount / $this->getRate($from);
-        if (strtoupper($to) != 'EUR') {
+        if ('EUR' !== mb_strtoupper($to)) {
             $currency = $currency * $this->getRate($to);
         }
+
         return number_format($currency, $decimals);
     }
 }

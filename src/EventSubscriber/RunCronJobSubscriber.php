@@ -5,9 +5,9 @@ namespace App\EventSubscriber;
 use App\Service\CronJobHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class RunCronJobSubscriber implements EventSubscriberInterface
 {
@@ -30,7 +30,7 @@ class RunCronJobSubscriber implements EventSubscriberInterface
         }
 
         $schemaManager = $this->em->getConnection()->getSchemaManager();
-        if ($schemaManager->tablesExist(['app_cronjob']) == true) {
+        if (true === $schemaManager->tablesExist(['app_cronjob'])) {
             $this->logger->info('Running cron jobs...');
             $this->cronJobHelper->execute();
         }

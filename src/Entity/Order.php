@@ -82,7 +82,7 @@ class Order
 
     /**
      * @var int
-     * @ORM\Column(type="smallint", options={"default":0})
+     * @ORM\Column(type="smallint", options={"default": 0})
      */
     protected $status = 0;
 

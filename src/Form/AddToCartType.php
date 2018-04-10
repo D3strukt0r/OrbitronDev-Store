@@ -16,18 +16,18 @@ class AddToCartType extends AbstractType
     {
         $builder
             ->add('product_count', IntegerType::class, [
-                'label'       => 'service_product.form_cart.product_count.label',
+                'label' => 'service_product.form_cart.product_count.label',
                 'constraints' => [
                     new NotBlank(['message' => 'service_product.form_cart.product_count.constraints.not_blank']),
                     new Type([
-                        'type'    => 'int',
+                        'type' => 'int',
                         'message' => 'service_product.form_cart.product_count.constraints.not_an_int',
                     ]),
                 ],
-                'disabled'    => $options['disable_fields'] ? true : false,
+                'disabled' => $options['disable_fields'] ? true : false,
             ])
             ->add('send', SubmitType::class, [
-                'label'    => 'service_product.form_cart.send.label',
+                'label' => 'service_product.form_cart.send.label',
                 'disabled' => $options['disable_fields'] ? true : false,
             ]);
     }

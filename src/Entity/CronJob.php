@@ -20,13 +20,13 @@ class CronJob
 
     /**
      * @var bool
-     * @ORM\Column(type="boolean", options={"default":true})
+     * @ORM\Column(type="boolean", options={"default": true})
      */
     protected $enabled = true;
 
     /**
      * @var int
-     * @ORM\Column(type="smallint", options={"default":5})
+     * @ORM\Column(type="smallint", options={"default": 5})
      */
     protected $priority = 5;
 
@@ -44,7 +44,7 @@ class CronJob
 
     /**
      * @var int
-     * @ORM\Column(type="bigint", options={"default":3600})
+     * @ORM\Column(type="bigint", options={"default": 3600})
      */
     protected $exec_every = 3600;
 
