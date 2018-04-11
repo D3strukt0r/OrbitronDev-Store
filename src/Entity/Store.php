@@ -21,19 +21,19 @@ class Store
 
     /**
      * @var string
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string", unique=true, length=191)
      */
     protected $name;
 
     /**
      * @var string
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string", unique=true, length=191)
      */
     protected $url;
 
     /**
      * @var string
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string", unique=true, length=191)
      */
     protected $email;
 
