@@ -19,19 +19,6 @@
 {% set language = app.request.getLocale() %}
 {% set currency = app.session.get('_currency') %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        #map {
-            height: 100%;
-        }
-
-        #locationField, #controls {
-            position: relative;
-        }
-    </style>
-{% endblock %}
-
 {% block javascripts %}
     {{ parent() }}
     <script>
@@ -115,68 +102,20 @@
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSO1fpoQuukeVKiueZxzqhLCFlkgP0IMM&libraries=places&callback=initAutocomplete" async defer></script>
     <script>
-        function checkoutSubtractQuantity(element) {
-            var elemPrice = $('#' + element + '_price');
-            var elemTotal = $('#' + element + '_total');
-            var elemInput = $('#' + element);
-            var number = parseInt(elemInput.val());
-            if(number - 1 < 0) {
-            } else {
-                var newTotal = --number;
-                var newTotalPrice = parseFloat(elemPrice.text()) * newTotal;
-                elemInput.val(newTotal);
+        var debug = {{ app.debug }};
 
-                if (elemPrice.text() !== '{{ 'service_general.free'|trans }}') {
-                    updateTotal(newTotalPrice, elemTotal);
-                }
-            }
-        }
-
-        function checkoutAddQuantity(element) {
-            var elemPrice = $('#' + element + '_price');
-            var elemTotal = $('#' + element + '_total');
-            var elemInput = $('#' + element);
-            var number = parseInt(elemInput.val());
-            var newTotal = ++number;
-            var newTotalPrice = parseFloat(elemPrice.text()) * newTotal;
-            elemInput.val(newTotal);
-
-            if (elemPrice.text() !== '{{ 'service_general.free'|trans }}') {
-                updateTotal(newTotalPrice, elemTotal);
-            }
-        }
-
-        function updateTotal(newProductTotal, elem) {
-            var oldProductTotal = parseFloat(elem.text());
-            elem.text(number_format(newProductTotal, 2, '.', '\''));
-
-            var elemSubtotal = $('#subtotal-price');
-            var subtotal = parseFloat(elemSubtotal.text());
-            var newSubtotal = (subtotal - oldProductTotal) + newProductTotal;
-            elemSubtotal.text(number_format(newSubtotal, 2, '.', '\''));
-
-            var elemTotal = $('#output-price');
-            var total = parseFloat(elemTotal.text());
-            var newTotal = (total - oldProductTotal) + newProductTotal;
-            elemTotal.text(number_format(newTotal, 2, '.', '\''));
-
-        }
-
-
-        function checkoutDisableTransport() {
-            $('.billing-info-inputs :input').prop('disabled', false);
-        }
-        function checkoutEnableTransport() {
-            $('.billing-info-inputs :input').prop('disabled', true);
-        }
-        function checkoutToggleTransport() {
-            if(this.checked) {
-                checkoutDisableTransport();
-            } else {
-                checkoutEnableTransport();
-            }
-        }
-
+        // CLEAR CHECKOUT FUNCTIONALITY
+        $('#js-clear-checkout').click(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: '{{ path('store_do_clear_cart', {'store': current_store.url}) }}',
+                type: 'GET'
+            }).done(function(data) {
+                location.reload();
+            }).fail(function() {
+                console.log('Ajax failed!');
+            });
+        });
         function checkoutRemoveProduct(productName, count) {
             count = count || 0;
 
@@ -201,11 +140,80 @@
             });
         }
 
+        // ADD TO/REMOVE FROM CART FUNCTIONALITY
+        $('.js-product-quantity').on('input', function(event) {
+            var elemInput = $(this);
+            var elemPrice = $('#' + elemInput.attr('name') + '_price');
+            var elemTotal = $('#' + elemInput.attr('name') + '_total');
+            var quantity = parseInt(elemInput.val());
+
+            var newTotalPrice = parseFloat(elemPrice.text()) * quantity;
+            elemInput.val(quantity);
+            elemTotal.text(number_format(newTotalPrice, 2, '.', '\''));
+
+            if (elemPrice.text() !== '{{ 'service_general.free'|trans }}') {
+                updateTotal();
+            }
+
+            if (debug) console.log(elemInput.attr('id') + ' has changed quantity to ' + elemInput.val());
+        });
+
+        function checkoutSubtractQuantity(product_id) {
+            var elemInput = $('[name=product_quantity_' + product_id + ']');
+            var number = parseInt(elemInput.val());
+            if(number - 1 < 0) {
+            } else {
+                var newTotal = number - 1;
+                elemInput.val(newTotal);
+                elemInput.trigger('input');
+            }
+        }
+
+        function checkoutAddQuantity(product_id) {
+            var elemInput = $('[name=product_quantity_' + product_id + ']');
+            var number = parseInt(elemInput.val());
+            var newTotal = number + 1;
+            elemInput.val(newTotal);
+            elemInput.trigger('input');
+        }
+
+        function updateTotal() {
+            // Get current total of all products
+            var productTotal = 0;
+            $('.js-product-quantity-total').each(function (index) {
+                var x = $(this).text();
+                productTotal += parseFloat(x.match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]);
+            });
+
+            // Update subtotal
+            $('#subtotal-price').text(number_format(productTotal, 2, '.', '\''));
+
+            // Update total
+            var shipping = parseFloat($('#output-shipping').text().match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]);
+            $('#output-price').text(number_format(productTotal + shipping, 2, '.', '\''));
+            $('[name=output-price]').val(productTotal + shipping);
+        }
+
+
+        function checkoutDisableTransport() {
+            $('.billing-info-inputs :input').prop('disabled', false);
+        }
+        function checkoutEnableTransport() {
+            $('.billing-info-inputs :input').prop('disabled', true);
+        }
+        function checkoutToggleTransport() {
+            if(this.checked) {
+                checkoutDisableTransport();
+            } else {
+                checkoutEnableTransport();
+            }
+        }
+
         // DELIVERY FUNCTIONALITY
         {# TODO: Delivery is still problematic #}
         var elShippingMethod = $('input[name=shipping]:checked', '#transport');
         var elShippingCost = $('#output-shipping');
-        var elFormPriceHidden = $('#hidden-output-price');
+        var elFormPriceHidden = $('[name=output-price]');
         var elFormPrice = $('#output-price');
 
         var transport_price, new_transport_price = 0, form_price, form_new_price = 0;
@@ -213,7 +221,7 @@
         if (isNaN(transport_price)) {
             transport_price = parseFloat($('#output-shipping').text());
         }
-        form_price = parseFloat($('#hidden-output-price').val());
+        form_price = parseFloat($('[name=output-price]').val());
 
         $('#transport').find('input[type=radio]').on('change', function() {
             new_transport_price = parseFloat($('input[name=shipping]:checked', '#transport').data('cost'));
@@ -229,7 +237,7 @@
               var form_new_price = form_old_price - old_price + price;
               console.log(form_new_price);
 */
-            $('#hidden-output-price').val(form_new_price);
+            $('[name=output-price]').val(form_new_price);
             $('#output-price').text(number_format(form_new_price, 2, '.', '\''));
         });
 
@@ -271,18 +279,6 @@
             });
         });
 
-        // CLEAR CHECKOUT FUNCTIONALITY
-        $('#js-clear-checkout').click(function(event) {
-            event.preventDefault();
-            $.ajax({
-                url: '{{ path('store_do_clear_cart', {'store': current_store.url}) }}',
-                type: 'GET'
-            }).done(function(data) {
-                location.reload();
-            }).fail(function() {
-                console.log('Ajax failed!');
-            });
-        });
     </script>
 {% endblock %}
 
@@ -328,6 +324,7 @@
                     {% endfor %}
                 </div>
             {% endif %}
+
             <div id="voucher" class="card mb-2">
                 <div class="card-body">
                     <div class="row">
@@ -355,12 +352,14 @@
                     </div>
                 </div>
             </div>
+
             <div id="transport" class="card mb-2">
                 <div class="card-body">
                     <label>{{ 'service_checkout.shipping_method.title'|trans }}</label>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <tbody>
+                                {% set deliveryPrice = 0 %}
                                 {% for delivery in delivery_types %}
                                     <tr>
                                         <td><input type="radio" name="shipping" value="{{ delivery.id }}" data-cost="{{ delivery.price }}" /></td>
@@ -370,12 +369,10 @@
                                 {% endfor %}
                             </tbody>
                         </table>
-                        <!-- /.table .table-hover -->
                     </div>
-                    <!-- /.table-responsive -->
-                    {% set deliveryPrice = 7 %}
                 </div>
             </div>
+
             <div id="payment-method" class="card mb-2">
                 <div class="card-body">
                     {% if payment is null %}
@@ -385,10 +382,8 @@
                             <script src="https://js.braintreegateway.com/web/dropin/1.10.0/js/dropin.min.js"></script>
                             <input type="hidden" name="payment_method_nonce" value="fake-valid-nonce" />
                             <div id="dropin-container"></div>
-                            <button id="submit-button" class="btn btn-success btn-block">{{ 'Validate payment method' }}</button>
+                            <button id="submit-button" class="btn btn-success btn-block">{{ 'Validate payment method'|trans }}</button>
                             <script>
-                                var button = $('#submit-button');
-
                                 $(document).ready(function () {
                                     $('#form_send').attr('disabled', true);
                                 });
@@ -400,7 +395,7 @@
                                         flow: 'vault'
                                     }
                                 }, function (createErr, instance) {
-                                    button.click(function (event) {
+                                    $('#submit-button').click(function (event) {
                                         event.preventDefault();
                                         instance.requestPaymentMethod(function (err, payload) {
                                             if (err) {
@@ -422,6 +417,7 @@
                     {% endif %}
                 </div>
             </div>
+
             <div id="cart" class="card mb-2">
                 <div class="card-body">
                     <label>{{ 'service_checkout.cart.title'|trans }}</label>
@@ -445,9 +441,11 @@
                                             <td>
                                                 <div class="media">
                                                     {#<a class="thumbnail pull-left" style="border: 0;" href="#"> <img class="media-object" src="{{ asset('app/store/products_img/' ~ product.id ~ '/' ~ product.small_icon) }}" style="width: 72px; height: 72px;"> </a>#}
-                                                    <a class="thumbnail pull-left" style="border: 0;margin-bottom: 0;" href="#"> <img class="media-object" src="http://icons.iconarchive.com/icons/custom-icon-design/flatastic-2/72/product-icon.png" style="width: 72px; height: 72px;"> </a>
+                                                    <a class="thumbnail pull-left" style="border: 0;margin-bottom: 0;" href="{{ path('store_product', {'store': current_store.url, 'product': product.id}) }}">
+                                                        <img class="media-object" src="http://icons.iconarchive.com/icons/custom-icon-design/flatastic-2/72/product-icon.png" style="width: 72px; height: 72px;">
+                                                    </a>
                                                     <div class="media-body" style="padding-left:5px;padding-top:5px;">
-                                                        <h4 class="media-heading"><a href="#">{{ product.name }}</a></h4>
+                                                        <h4 class="media-heading"><a href="{{ path('store_product', {'store': current_store.url, 'product': product.id}) }}">{{ product.name }}</a></h4>
                                                         {#<h5 class="media-heading"> by <a href="#">Brand name</a></h5>#}
                                                         <span>{{ 'service_checkout.cart.table.status'|trans }} </span><span class="text-success"><strong>{% if product.stock > 0 %}{{ 'service_checkout.cart.table.in_stock'|trans }} ({{ product.stock }}){% endif %}</strong></span>
                                                     </div>
@@ -457,37 +455,47 @@
                                             <td>
                                                 <div class="input-group">
                                                     <div class="input-group-prepend">
-                                                        <button class="btn btn-secondary" type="button" name="subtract" onclick="checkoutSubtractQuantity('product_quantity_{{ product.id }}')" value="-">-</button>
+                                                        <button class="btn btn-secondary" type="button" name="subtract" onclick="checkoutSubtractQuantity('{{ product.id }}')" value="-">-</button>
                                                     </div>
-                                                    <input type="text" class="form-control text-center" name="product_quantity_{{ product.id }}" value="{{ product.in_cart }}" id="product_quantity_{{ product.id }}" title="quantity" />
+                                                    <input type="text" class="form-control text-center js-product-quantity" name="product_quantity_{{ product.id }}" value="{{ product.in_cart }}" title="quantity" />
                                                     <div class="input-group-append">
-                                                        <button class="btn btn-secondary" type="button" name="add" onclick="checkoutAddQuantity('product_quantity_{{ product.id }}')" value="+">+</button>
+                                                        <button class="btn btn-secondary" type="button" name="add" onclick="checkoutAddQuantity('{{ product.id }}')" value="+">+</button>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                {% if product.in_sale %}
-                                                    <span style="text-decoration:line-through">
-                                                        {% if product.price == 0 %}{{ 'service_general.free'|trans }}{% else %}{{ product.price|number_format(2, '.', '\'') }} ${% endif %}
-                                                    </span>
-                                                    <br />
-                                                    {% if product.price_sale == 0 %}{{ 'service_general.free'|trans }}{% else %}<span id="product_quantity_{{ product.id }}_price">{{ product.price_sale|number_format(2, '.', '\'') }}</span> ${% endif %}
+                                                {% if product.price == 0 %}
+                                                    {{ 'service_general.free'|trans }}
                                                 {% else %}
-                                                    {% if product.price == 0 %}{{ 'service_general.free'|trans }}{% else %}<span id="product_quantity_{{ product.id }}_price">{{ product.price|number_format(2, '.', '\'') }}</span> ${% endif %}
+                                                    {% if product.in_sale %}
+                                                        <span style="text-decoration:line-through">{{ product.price|number_format(2, '.', '\'') }} {{ currency }}</span><br />
+                                                        {% if product.price_sale == 0 %}
+                                                            {{ 'service_general.free'|trans }}
+                                                        {% else %}
+                                                            <span id="product_quantity_{{ product.id }}_price">{{ product.price_sale|number_format(2, '.', '\'') }}</span> {{ currency }}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <span id="product_quantity_{{ product.id }}_price">{{ product.price|number_format(2, '.', '\'') }}</span> {{ currency }}
+                                                    {% endif %}
                                                 {% endif %}
                                             </td>
                                             <td>
                                                 {% set product_total_price = product.price * product.in_cart %}
                                                 {% set product_total_price_sale = product.price_sale * product.in_cart %}
 
-                                                {% if product.in_sale %}
-                                                    <span style="text-decoration:line-through">
-                                                        {% if product_total_price == 0 %}{{ 'service_general.free'|trans }}{% else %}{{ product_total_price|number_format(2, '.', '\'') }} ${% endif %}
-                                                    </span>
-                                                    <br />
-                                                    <b>{% if product_total_price_sale == 0 %}{{ 'service_general.free'|trans }}{% else %}<span id="product_quantity_{{ product.id }}_total">{{ product_total_price_sale|number_format(2, '.', '\'') }}</span> ${% endif %}</b>
+                                                {% if product_total_price == 0 %}
+                                                    {{ 'service_general.free'|trans }}
                                                 {% else %}
-                                                    <b>{% if product_total_price == 0 %}{{ 'service_general.free'|trans }}{% else %}<span id="product_quantity_{{ product.id }}_total">{{ product_total_price|number_format(2, '.', '\'') }}</span> ${% endif %}</b>
+                                                    {% if product.in_sale %}
+                                                        <span style="text-decoration:line-through">{{ product_total_price|number_format(2, '.', '\'') }} {{ currency }}</span><br />
+                                                        <b>{% if product_total_price_sale == 0 %}
+                                                                {{ 'service_general.free'|trans }}
+                                                            {% else %}
+                                                                <span class="js-product-quantity-total" id="product_quantity_{{ product.id }}_total">{{ product_total_price_sale|number_format(2, '.', '\'') }}</span> {{ currency }}
+                                                            {% endif %}</b>
+                                                    {% else %}
+                                                        <b><span class="js-product-quantity-total" id="product_quantity_{{ product.id }}_total">{{ product_total_price|number_format(2, '.', '\'') }}</span> {{ currency }}</b>
+                                                    {% endif %}
                                                 {% endif %}
                                             </td>
                                             <td>
@@ -503,30 +511,24 @@
 
                                     {% set fullPrice = productPrice + deliveryPrice %}
                                     <tr>
-                                        <td> </td>
-                                        <td> </td>
-                                        <td> </td>
+                                        <td> </td><td> </td><td> </td>
                                         <td><h5>{{ 'service_checkout.cart.table.subtotal'|trans }}</h5></td>
                                         <td class="text-right"><h5><strong><span id="subtotal-price">{{ productPrice|number_format(2, '.', '\'') }}</span> {{ currency }}</strong></h5></td>
                                     </tr>
                                     <tr>
-                                        <td> </td>
-                                        <td> </td>
-                                        <td> </td>
+                                        <td> </td><td> </td><td> </td>
                                         <td><h5>{{ 'service_checkout.cart.table.shipping'|trans }}</h5></td>
                                         <td class="text-right"><h5><strong><span id="output-shipping">{{ deliveryPrice|number_format(2, '.', '\'') }}</span> {{ currency }}</strong></h5></td>
                                     </tr>
                                     <tr>
-                                        <td> </td>
-                                        <td> </td>
-                                        <td> </td>
+                                        <td> </td><td> </td><td> </td>
                                         <td><h3>{{ 'service_checkout.cart.table.total'|trans }}</h3></td>
                                         <td class="text-right"><h3><strong><span id="output-price">{{ fullPrice|number_format(2, '.', '\'') }}</span> {{ currency }}</strong></h3></td>
+                                        <input type="hidden" name="output-price" value="{{ fullPrice }}" />
                                     </tr>
                                 </tbody>
-                            </table><!-- /.table .table-hover -->
-                        </div><!-- /.table-responsive -->
-                        <input type="hidden" id="hidden-output-price" name="output-price" value="{{ fullPrice }}" />
+                            </table>
+                        </div>
                         <script>
                             var productPrice = {{ productPrice|default(0) }};
                             if(productPrice === 0) {
@@ -543,6 +545,7 @@
                     {% endif %}
                 </div>
             </div>
+
             <div id="order-button" class="card">
                 <div class="card-body">
                     <span class="pull-right">
@@ -551,6 +554,7 @@
                 </div>
             </div>
         </section>
+
         <section id="personal-information" class="col-md-4 order-first order-md-2 mb-2">
             <div class="card">
                 <div class="card-body">
@@ -571,9 +575,7 @@
                     </div>
                     <hr />
                     <div class="form-group">
-                        <div id="locationField">
-                            <input class="form-control" id="pac-input" placeholder="{{ 'service_checkout.form.location.placeholder'|trans }}" autocomplete="nope" onfocus="geolocate()" />
-                        </div>
+                        <input class="form-control" id="pac-input" placeholder="{{ 'service_checkout.form.location.placeholder'|trans }}" autocomplete="nope" onfocus="geolocate()" />
                     </div>
                     <div class="form-group">
                         <div class="row">

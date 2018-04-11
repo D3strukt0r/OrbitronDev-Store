@@ -161,10 +161,10 @@ class CartHelper
     /**
      * Remove a product from the cart.
      *
-     * @param \App\Entity\Product $product (Required) to know which product
-     * @param null                $count   (Optional) Amount to be removed
+     * @param int  $product_id (Required) to know which product
+     * @param null $count      (Optional) Amount to be removed
      */
-    public function removeFromCart(Product $product, $count = null): void
+    public function removeFromCart(int $product_id, $count = null): void
     {
         if (!$this->initialised) {
             return;
@@ -172,13 +172,13 @@ class CartHelper
 
         $products = $this->cart->getProducts();
 
-        if (isset($products[$product->getId()])) {
-            if ((null !== $count || $count > 0) && $products[$product->getId()]['count'] > $count) {
+        if (isset($products[$product_id])) {
+            if ((null !== $count || $count > 0) && $products[$product_id]['count'] > $count) {
                 // Only remove the amount
-                $products[$product->getId()]['count'] -= $count;
+                $products[$product_id]['count'] -= $count;
             } else {
                 // Remove the product
-                unset($products[$product->getId()]);
+                unset($products[$product_id]);
             }
             $this->cart->setProducts($products);
             $this->em->flush();
