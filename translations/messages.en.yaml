@@ -205,13 +205,16 @@ service_checkout:
         check: 'Check!'
         valid: 'Valid code'
         invalid: 'Invalid code'
-        type: 'Type:'
+        code: 'Code'
+        type: 'Type'
         percentage: 'Percentage'
         exact: 'Exact amount'
-        amount: 'Amount:'
+        amount: 'Amount'
     shipping_method:
         title: 'Shipping method'
     payment_method:
+        braintree:
+            validate: 'Validate payment method'
         no_method: 'No payment method has been created by the store owner'
     cart:
         title: 'Cart'
@@ -224,6 +227,8 @@ service_checkout:
             status: 'Status:'
             in_stock: 'In Stock'
             remove: 'Remove'
+            product_total: 'Product total'
+            voucher_total: 'Voucher discount'
             subtotal: 'Subtotal'
             shipping: 'Estimated shipping'
         empty: 'Your cart is empty!'
@@ -263,4 +268,4 @@ service_checkout:
             constraints:
                 not_blank: 'Please enter your country'
         send:
-            label: 'Order'
+            label: 'Pay and send order'

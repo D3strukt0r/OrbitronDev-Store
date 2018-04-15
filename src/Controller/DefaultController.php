@@ -432,6 +432,7 @@ class DefaultController extends Controller
             $result->addChild('result', 'invalid');
         } else {
             $result->addChild('result', 'valid');
+            $result->addChild('code', $voucher->getCode());
             $result->addChild('type', $voucher->getType());
             $result->addChild('amount', $voucher->getAmount());
         }
