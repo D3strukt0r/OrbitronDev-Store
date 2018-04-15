@@ -52,6 +52,9 @@ admin:
         back: 'Back to service'
         logout: 'Logout'
     close: 'Close'
+    faq: 'FAQ'
+    support: 'Support'
+    contact: 'Contact US'
     form:
         create_voucher:
             code:

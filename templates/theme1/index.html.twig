@@ -77,7 +77,7 @@
                     </div>
                     <div class="checkout-bottom">
                         <a href="{{ path('store_checkout', {'store': current_store.url}) }}" class="btn btn-primary btn-xs"><i class="fa fa-shopping-cart"></i> {{ 'service_general.nav.checkout'|trans }}</a>
-                        <span class="shc-total">{{ 'service_general.nav.total'|trans }} <strong>{{ cart.system.total_price|number_format(2, '.', '\'') }} $</strong></span> {# TODO: Make this editable by the user #}
+                        <span class="shc-total">{{ 'service_general.nav.total'|trans }} <strong>{{ cart.system.total_price|number_format(2, '.', '\'') }} {{ currency }}</strong></span>
                     </div>
                 </div>
             </div>
