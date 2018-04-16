@@ -102,259 +102,322 @@
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSO1fpoQuukeVKiueZxzqhLCFlkgP0IMM&libraries=places&callback=initAutocomplete" async defer></script>
     <script>
-        var debug = {{ app.debug }};
+        class Checkout {
+            constructor(options) {
+                // Set all options
+                this.options = {
+                    'debug': false,
+                    'voucher': {
+                        'nr': 0,
+                        'check_voucher': null,
+                        'check_voucher_url': null,
+                        'voucher_code': null,
+                        'loading': null,
+                        'table': null,
+                        'table_body': null,
+                    },
+                    'shipping': {
 
-        // CLEAR CHECKOUT FUNCTIONALITY
-        $('#js-clear-checkout').click(function(event) {
-            event.preventDefault();
-            $.ajax({
-                url: '{{ path('store_do_clear_cart', {'store': current_store.url}) }}',
-                type: 'GET'
-            }).done(function(data) {
-                location.reload();
-            }).fail(function() {
-                console.log('Ajax failed!');
-            });
-        });
-        function checkoutRemoveProduct(productName, count) {
-            count = count || 0;
+                    },
+                    'payment': {
 
-            $.ajax({
-                method: 'POST',
-                url: '{{ path('store_do_remove_from_cart', {'store': current_store.url}) }}',
-                data: { product: productName, product_count: count, response: 'json' },
-                async: true,
-                beforeSend: function( xhr ) {
-                    xhr.overrideMimeType('text/plain; charset=x-user-defined');
-                }
-            }).done(function(data) {
-                var response = JSON.parse(data);
-                if(response['result'] === 'true') {
-                    console.log(response);
-                    console.info('[Checkout] Product deleted');
-                } else {
-                    alert('Product couldn\'t be removed, try again.');
-                }
-            }).fail(function() {
-                alert('Product couldn\'t be removed, try again.');
-            });
-        }
+                    },
+                    'cart': {
+                        'clear_cart': null,
+                        'clear_cart_url': null,
+                        'remove_product': null,
+                        'remove_product_url': null,
+                        'product_quantity': null,
+                        'total_each_product': null,
+                        'total_product': null,
+                        'total_voucher': null,
+                        'subtotal': null,
+                        'shipping': null,
+                        'total': null,
+                        'total_input': null
+                    },
+                };
+                // Override defaults
+                $.extend(true, this.options, options);
 
-        // ADD TO/REMOVE FROM CART FUNCTIONALITY
-        $('.js-product-quantity').on('input', function(event) {
-            var elemInput = $(this);
-            var elemPrice = $('#' + elemInput.attr('name') + '_price');
-            var elemTotal = $('#' + elemInput.attr('name') + '_total');
-            var quantity = parseInt(elemInput.val());
+                // Set clear_checkout listener
+                this.options.cart.clear_cart.click({'checkout': this}, function(event) {
+                    event.preventDefault();
+                    event.data.checkout.clearCart();
+                });
 
-            var newTotalPrice = parseFloat(elemPrice.text()) * quantity;
-            elemInput.val(quantity);
-            elemTotal.text(number_format(newTotalPrice, 2, '.', '\''));
+                // Set the quantity change listener
+                this.options.cart.product_quantity.on('input', {'checkout': this}, function(event) {
+                    let elemInput = $(this);
+                    let elemPrice = $('#' + elemInput.attr('name') + '_price');
+                    let elemTotal = $('#' + elemInput.attr('name') + '_total');
+                    let quantity = parseInt(elemInput.val());
 
-            if (elemPrice.text() !== '{{ 'service_general.free'|trans }}') {
-                updateTotal();
+                    let newTotalPrice = parseFloat(elemPrice.text()) * quantity;
+                    elemInput.val(quantity);
+                    elemTotal.text(number_format(newTotalPrice, 2, '.', '\''));
+
+                    if (elemPrice.text() !== '{{ 'service_general.free'|trans }}') {
+                        event.data.checkout.updateTotal();
+                    }
+
+                    if (event.data.checkout.debug) console.log(elemInput.attr('id') + ' has changed quantity to ' + elemInput.val());
+                });
+
+                // Set the check voucher listener
+                this.options.voucher.check_voucher.click({'checkout': this}, function(event) {
+                    event.data.checkout.checkVoucher();
+                });
             }
 
-            if (debug) console.log(elemInput.attr('id') + ' has changed quantity to ' + elemInput.val());
-        });
+            static createSuccessNotification(text) {
+                new Noty({
+                    text: text,
+                    timeout: 3000,
+                    type: 'success',
+                    layout: 'topRight',
+                    closeWith: ['click', 'button'],
+                    animation: {
+                        open : 'animated fadeInRight',
+                        close: 'animated fadeOutRight'
+                    }
+                }).show();
+            }
 
-        function checkoutSubtractQuantity(product_id) {
-            var elemInput = $('[name=product_quantity_' + product_id + ']');
-            var number = parseInt(elemInput.val());
-            if(number - 1 < 0) {
-            } else {
-                var newTotal = number - 1;
+            static createFailureNotification(text) {
+                new Noty({
+                    text: text,
+                    timeout: 3000,
+                    type: 'error',
+                    layout: 'topRight',
+                    closeWith: ['click', 'button'],
+                    animation: {
+                        open : 'animated fadeInRight',
+                        close: 'animated fadeOutRight'
+                    }
+                }).show();
+            }
+
+            clearCart() {
+                if (this.options.debug) console.log('Clearing cart...');
+                $.ajax({
+                    url: this.options.cart.clear_cart_url,
+                    type: 'GET'
+                }).done(function(data) {
+                    location.reload();
+                }).fail(function() {
+                    Checkout.createFailureNotification('Could not clear cart');
+                });
+            }
+
+            removeProduct(productId, count) {
+                count = count || 0;
+
+                $.ajax({
+                    method: 'POST',
+                    url: this.options.cart.remove_product_url,
+                    data: { product: productId, product_count: count, response: 'json' },
+                    async: true,
+                    beforeSend: function(xhr) {
+                        xhr.overrideMimeType('text/plain; charset=x-user-defined');
+                    }
+                }).done(function(data) {
+                    let response = JSON.parse(data);
+                    if(response['result'] === 'true') {
+                        Checkout.createSuccessNotification('[Checkout] Product deleted');
+                    } else {
+                        Checkout.createFailureNotification('Product couldn\'t be removed, try again.');
+                    }
+                }).fail(function() {
+                    Checkout.createFailureNotification('Product couldn\'t be removed, try again.');
+                });
+            }
+
+            checkVoucher() {
+                this.options.voucher.loading.show();
+                $.ajax({
+                    url: this.options.voucher.check_voucher_url,
+                    type: 'GET',
+                    data: { code : this.options.voucher.voucher_code.val() }
+                }).done(function(data) {
+                    checkout.options.voucher.loading.hide();
+                    let validation = $(data).find('result').first().text();
+                    if(validation === 'invalid') {
+                        Checkout.createFailureNotification('{{ 'service_checkout.voucher.invalid'|trans }}');
+                    }
+                    else if(validation === 'valid') {
+                        let reduceType = parseInt($(data).find('type').first().text(), 10);
+                        let amount = $(data).find('amount').first().text();
+                        let code = $(data).find('code').first().text();
+
+                        let codeExists = false;
+                        $('.js-voucher-codes').each(function() {
+                            if ($(this).text() === code) {
+                                codeExists = true;
+                            }
+                        });
+                        if (codeExists) {
+                            Checkout.createFailureNotification('{{ 'service_checkout.voucher.invalid'|trans }}');
+                            return;
+                        }
+
+                        Checkout.createSuccessNotification('{{ 'service_checkout.voucher.valid'|trans }}');
+
+                        checkout.options.voucher.table.show();
+                        checkout.addVoucher(reduceType, amount, code);
+
+                        checkout.updateTotal();
+                    }
+                }).fail(function() {
+                    Checkout.createFailureNotification('{{ 'service_checkout.voucher.invalid'|trans }}');
+                    if (this.options.debug) console.error('Ajax failed for voucher check!');
+                });
+            }
+
+            calculateType0Voucher(productTotal, voucherList, index) {
+                index = (typeof index === 'undefined') ? 0 : index;
+
+                if (voucherList.length === 0) return 0;
+
+                let discount = productTotal * (voucherList[index] / 100);
+
+                if (index + 1 !== voucherList.length) {
+                    discount += this.calculateType0Voucher(productTotal - discount, voucherList, index + 1);
+                }
+
+                return discount;
+            }
+
+            addVoucher(reduceType, amount, code) {
+                this.options.voucher.nr++;
+                if (reduceType === 0) {
+                    this.options.voucher.table_body.append('<tr>' +
+                        '<td scope="row" class="js-voucher">' +
+                        this.options.voucher.nr +
+                        '<span class="js-voucher-type" style="display:none">0</span>' +
+                        '<span class="js-voucher-amount" style="display:none">' + amount + '</span>' +
+                        '</td>' +
+                        '<td class="js-voucher-codes">' + code + '</td>' +
+                        '<td>{{ 'service_checkout.voucher.percentage'|trans }}</td>' +
+                        '<td>' + amount + '%</td>' +
+                        '</tr>');
+                } else if (reduceType === 1) {
+                    this.options.voucher.table_body.append('<tr>' +
+                        '<td scope="row" class="js-voucher">' +
+                        this.options.voucher.nr +
+                        '<span class="js-voucher-type" style="display:none">0</span>' +
+                        '<span class="js-voucher-amount" style="display:none">' + number_format(amount, 2, '.', '\'') + '</span>' +
+                        '</td>' +
+                        '<td class="js-voucher-codes">' + code + '</td>' +
+                        '<td>{{ 'service_checkout.voucher.exact'|trans }}</td>' +
+                        '<td>' + number_format(amount, 2, '.', '\'') + '</td>' +
+                        '</tr>');
+                }
+            }
+
+            updateTotal() {
+                // Get current total of all products
+                let productTotal = 0;
+                this.options.cart.total_each_product.each(function (index) {
+                    let x = $(this).text();
+                    productTotal += parseFloat(x.match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]);
+                });
+
+                // Update product total
+                this.options.cart.total_product.text(number_format(productTotal, 2, '.', '\''));
+
+                // Update Voucher 1 (Type 0)
+                let vouchersType0 = [];
+                let vouchersType1 = [];
+                $('.js-voucher').each(function() {
+                    let type = $(this).find('.js-voucher-type').text();
+                    let amount = $(this).find('.js-voucher-amount').text();
+                    if (type === 0 || type === "0") {
+                        vouchersType0.push(amount);
+                    } else if (type === 1 || type === "1") {
+                        vouchersType1.push(amount);
+                    }
+                });
+                let discount = this.calculateType0Voucher(productTotal, vouchersType0);
+                this.options.cart.total_voucher.text(number_format(discount, 2, '.', '\''));
+
+                // Update subtotal
+                let subtotal = productTotal - discount;
+                this.options.cart.subtotal.text(number_format(subtotal, 2, '.', '\''));
+
+                // Update total
+                let shipping = parseFloat(this.options.cart.shipping.text().match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]);
+                let total = subtotal + shipping;
+                this.options.cart.total.text(number_format(total, 2, '.', '\''));
+                this.options.cart.total_input.val(total);
+            }
+
+            static checkoutSubtractQuantity(product_id) {
+                let elemInput = $('[name=product_quantity_' + product_id + ']');
+                let number = parseInt(elemInput.val());
+                if(number - 1 < 0) {
+                } else {
+                    let newTotal = number - 1;
+                    elemInput.val(newTotal);
+                    elemInput.trigger('input');
+                }
+            }
+
+            static checkoutAddQuantity(product_id) {
+                let elemInput = $('[name=product_quantity_' + product_id + ']');
+                let number = parseInt(elemInput.val());
+                let newTotal = number + 1;
                 elemInput.val(newTotal);
                 elemInput.trigger('input');
             }
         }
 
-        function checkoutAddQuantity(product_id) {
-            var elemInput = $('[name=product_quantity_' + product_id + ']');
-            var number = parseInt(elemInput.val());
-            var newTotal = number + 1;
-            elemInput.val(newTotal);
-            elemInput.trigger('input');
-        }
+        let checkout = new Checkout({
+            'debug': {{ app.debug }},
+            'voucher': {
+                'voucher_code': $('#js-voucher-code'),
+                'check_voucher': $('#js-check-voucher'),
+                'check_voucher_url': '{{ path('store_do_check_voucher', {'store': current_store.url}) }}',
+                'loading': $('#js-voucher-check-loading'),
+                'table': $('.js-voucher-table-hidden'),
+                'table_body': $('.js-voucher-table tbody'),
+            },
+            'shipping': {
 
-        function calculateType0Voucher(productTotal, voucherList, index) {
-            index = (typeof index === 'undefined') ? 0 : index;
+            },
+            'payment': {
 
-            if (voucherList.length === 0) return 0;
-
-            var discount = productTotal * (voucherList[index] / 100);
-
-            if (index + 1 !== voucherList.length) {
-                discount += calculateType0Voucher(productTotal - discount, voucherList, index + 1);
-            }
-
-            return discount;
-        }
-
-        function updateTotal() {
-            // Get current total of all products
-            var productTotal = 0;
-            $('.js-product-quantity-total').each(function (index) {
-                var x = $(this).text();
-                productTotal += parseFloat(x.match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]);
-            });
-
-            // Update product total
-            $('#product-price').text(number_format(productTotal, 2, '.', '\''));
-
-            // Update Voucher 1 (Type 0)
-            var vouchersType0 = [];
-            var vouchersType1 = [];
-            $('.js-voucher').each(function() {
-                var type = $(this).find('.js-voucher-type').text();
-                var amount = $(this).find('.js-voucher-amount').text();
-                if (type === 0 || type === "0") {
-                    vouchersType0.push(amount);
-                } else if (type === 1 || type === "1") {
-                    vouchersType1.push(amount);
-                }
-            });
-            var discount = calculateType0Voucher(productTotal, vouchersType0);
-            $('#voucher-total').text(number_format(discount, 2, '.', '\''));
-
-            // Update subtotal
-            var subtotal = productTotal - discount;
-            $('#subtotal-price').text(number_format(subtotal, 2, '.', '\''));
-
-            // Update total
-            var shipping = parseFloat($('#output-shipping').text().match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]);
-            var total = subtotal + shipping;
-            $('#output-price').text(number_format(total, 2, '.', '\''));
-            $('[name=output-price]').val(total);
-        }
-
-        function checkoutDisableTransport() {
-            $('.billing-info-inputs :input').prop('disabled', false);
-        }
-        function checkoutEnableTransport() {
-            $('.billing-info-inputs :input').prop('disabled', true);
-        }
-        function checkoutToggleTransport() {
-            if(this.checked) {
-                checkoutDisableTransport();
-            } else {
-                checkoutEnableTransport();
-            }
-        }
-
-        // VOUCHER FUNCTIONALITY
-        var voucherNr = 0;
-        function voucherAdd(reduceType, amount, code) {
-            voucherNr++;
-            if (reduceType === 0) {
-                $('.js-voucher-table tbody').append('<tr>' +
-                        '<td scope="row" class="js-voucher">' +
-                            voucherNr +
-                            '<span class="js-voucher-type" style="display:none">0</span>' +
-                            '<span class="js-voucher-amount" style="display:none">' + amount + '</span>' +
-                        '</td>' +
-                        '<td class="js-voucher-codes">' + code + '</td>' +
-                        '<td>{{ 'service_checkout.voucher.percentage'|trans }}</td>' +
-                        '<td>' + amount + '%</td>' +
-                    '</tr>');
-            } else if (reduceType === 1) {
-                $('.js-voucher-table tbody').append('<tr>' +
-                        '<td scope="row" class="js-voucher">' +
-                            voucherNr +
-                            '<span class="js-voucher-type" style="display:none">0</span>' +
-                            '<span class="js-voucher-amount" style="display:none">' + number_format(amount, 2, '.', '\'') + '</span>' +
-                        '</td>' +
-                        '<td class="js-voucher-codes">' + code + '</td>' +
-                        '<td>{{ 'service_checkout.voucher.exact'|trans }}</td>' +
-                        '<td>' + number_format(amount, 2, '.', '\'') + '</td>' +
-                    '</tr>');
-            }
-        }
-
-        $('#js-check-voucher').click(function() {
-            $('#js-voucher-info').hide();
-            $('#js-voucher-check-loading').show();
-            $.ajax({
-                url: '{{ path('store_do_check_voucher', {'store': current_store.url}) }}',
-                type: 'GET',
-                data: { code : $('#js-voucher-code').val() }
-            }).done(function(data) {
-                $('#js-voucher-check-loading').hide();
-                var validation = $(data).find('result').first().text();
-                if(validation === 'invalid') {
-                    new Noty({
-                        text: '{{ 'service_checkout.voucher.invalid'|trans }}',
-                        timeout: 3000,
-                        type: 'error',
-                        layout: 'topRight',
-                        closeWith: ['click', 'button'],
-                        animation: {
-                            open : 'animated fadeInRight',
-                            close: 'animated fadeOutRight'
-                        }
-                    }).show();
-                }
-                else if(validation === 'valid') {
-                    var reduceType = parseInt($(data).find('type').first().text());
-                    var amount = $(data).find('amount').first().text();
-                    var code = $(data).find('code').first().text();
-
-                    var codeExists = false;
-                    $('.js-voucher-codes').each(function() {
-                        if ($(this).text() === code) {
-                            codeExists = true;
-                        }
-                    });
-                    if (codeExists) {
-                        new Noty({
-                            text: '{{ 'service_checkout.voucher.invalid'|trans }}',
-                            timeout: 3000,
-                            type: 'error',
-                            layout: 'topRight',
-                            closeWith: ['click', 'button'],
-                            animation: {
-                                open : 'animated fadeInRight',
-                                close: 'animated fadeOutRight'
-                            }
-                        }).show();
-                        return;
-                    }
-
-                    new Noty({
-                        text: '{{ 'service_checkout.voucher.valid'|trans }}',
-                        timeout: 3000,
-                        type: 'success',
-                        layout: 'topRight',
-                        closeWith: ['click', 'button'],
-                        animation: {
-                            open : 'animated fadeInRight',
-                            close: 'animated fadeOutRight'
-                        }
-                    }).show();
-
-                    $('.js-voucher-table-hidden').show();
-                    voucherAdd(reduceType, amount, code);
-
-                    updateTotal();
-                }
-            }).fail(function() {
-                if (debug) console.error('Ajax failed for voucher check!');
-            });
+            },
+            'cart': {
+                'clear_cart': $('.js-clear-checkout'),
+                'clear_cart_url': '{{ path('store_do_clear_cart', {'store': current_store.url}) }}',
+                'remove_product': null,
+                'remove_product_url': '{{ path('store_do_remove_from_cart', {'store': current_store.url}) }}',
+                'product_quantity': $('.js-product-quantity'),
+                'total_each_product': $('.js-product-quantity-total'),
+                'total_product': $('.js-product-price-total'),
+                'total_voucher': $('.js-voucher-total'),
+                'subtotal': $('.js-subtotal'),
+                'shipping': $('.js-shipping-price'),
+                'total': $('.js-total-price'),
+                'total_input': $('[name=price]')
+            },
         });
-
+    </script>
+    <script>
         // DELIVERY FUNCTIONALITY
         {# TODO: Delivery is still problematic #}
-        var elShippingMethod = $('input[name=shipping]:checked', '#transport');
-        var elShippingCost = $('#output-shipping');
-        var elFormPriceHidden = $('[name=output-price]');
-        var elFormPrice = $('#output-price');
+        let elShippingMethod = $('input[name=shipping]:checked', '#transport');
+        let elShippingCost = $('.js-shipping-price');
+        let elFormPriceHidden = $('[name=price]');
+        let elFormPrice = $('.js-total-price');
 
-        var transport_price, new_transport_price = 0, form_price, form_new_price = 0;
+        let transport_price, new_transport_price = 0, form_price, form_new_price = 0;
         transport_price = parseFloat($('input[name=shipping]:checked', '#transport').data('cost'));
         if (isNaN(transport_price)) {
-            transport_price = parseFloat($('#output-shipping').text());
+            transport_price = parseFloat($('.js-shipping-price').text());
         }
-        form_price = parseFloat($('[name=output-price]').val());
+        form_price = parseFloat($('[name=price]').val());
 
         $('#transport').find('input[type=radio]').on('change', function() {
             new_transport_price = parseFloat($('input[name=shipping]:checked', '#transport').data('cost'));
@@ -370,8 +433,8 @@
               var form_new_price = form_old_price - old_price + price;
               console.log(form_new_price);
 */
-            $('[name=output-price]').val(form_new_price);
-            $('#output-price').text(number_format(form_new_price, 2, '.', '\''));
+            $('[name=price]').val(form_new_price);
+            $('.js-total-price').text(number_format(form_new_price, 2, '.', '\''));
         });
 
     </script>
@@ -517,7 +580,7 @@
             <div id="cart" class="card mb-2">
                 <div class="card-body">
                     <label>{{ 'service_checkout.cart.title'|trans }}</label>
-                    <span class="pull-right"><a href="#" id="js-clear-checkout" class="btn btn-danger btn-sm" style="cursor:pointer">{{ 'service_checkout.cart.clear'|trans }}</a></span>
+                    <span class="pull-right"><a href="#" class="btn btn-danger btn-sm js-clear-checkout">{{ 'service_checkout.cart.clear'|trans }}</a></span>
                     {% if cart|length > 0 %}
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -542,20 +605,19 @@
                                                     </a>
                                                     <div class="media-body pl-1 pt-1">
                                                         <h4 class="media-heading"><a href="{{ path('store_product', {'store': current_store.url, 'product': product.id}) }}">{{ product.name }}</a></h4>
-                                                        {#<h5 class="media-heading"> by <a href="#">Brand name</a></h5>#}
-                                                        <span>{{ 'service_checkout.cart.table.status'|trans }} </span><span class="text-success"><strong>{% if product.stock > 0 %}{{ 'service_checkout.cart.table.in_stock'|trans }} ({{ product.stock }}){% endif %}</strong></span>
+                                                        <span>{{ 'service_checkout.cart.table.status'|trans }} </span>
+                                                        <span class="text-success"><strong>{% if product.stock > 0 %}{{ 'service_checkout.cart.table.in_stock'|trans }} ({{ product.stock }}){% endif %}</strong></span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            {#<td class="col-sm-1"><input type="number" class="form-control" id="product_quantity_{{ product.id }}" value="{{ product.in_cart }}" /></td>#}
                                             <td>
                                                 <div class="input-group">
                                                     <div class="input-group-prepend">
-                                                        <button class="btn btn-secondary" type="button" name="subtract" onclick="checkoutSubtractQuantity('{{ product.id }}')" value="-">-</button>
+                                                        <button class="btn btn-secondary" type="button" name="subtract" onclick="Checkout.checkoutSubtractQuantity('{{ product.id }}')" value="-">-</button>
                                                     </div>
                                                     <input type="text" class="form-control text-center js-product-quantity" name="product_quantity_{{ product.id }}" value="{{ product.in_cart }}" title="quantity" />
                                                     <div class="input-group-append">
-                                                        <button class="btn btn-secondary" type="button" name="add" onclick="checkoutAddQuantity('{{ product.id }}')" value="+">+</button>
+                                                        <button class="btn btn-secondary" type="button" name="add" onclick="Checkout.checkoutAddQuantity('{{ product.id }}')" value="+">+</button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -612,32 +674,32 @@
                         <div class="row">
                             <div class="col-5"> </div>
                             <div class="col-4"><h5>{{ 'service_checkout.cart.table.product_total'|trans }}</h5></div>
-                            <div class="col-3"><h5 class="text-right"><strong><span id="product-price">{{ productPrice|number_format(2, '.', '\'') }}</span> {{ currency }}</strong></h5></div>
+                            <div class="col-3"><h5 class="text-right"><strong><span class="js-product-price-total">{{ productPrice|number_format(2, '.', '\'') }}</span> {{ currency }}</strong></h5></div>
                         </div>
                         <hr />
                         <div class="row">
                             <div class="col-5"> </div>
                             <div class="col-4"><h5>{{ 'service_checkout.cart.table.voucher_total'|trans }}</h5></div>
-                            <div class="col-3"><h5 class="text-right"><strong><span id="voucher-total">0.00</span> {{ currency }}</strong></h5></div>
+                            <div class="col-3"><h5 class="text-right"><strong><span class="js-voucher-total">0.00</span> {{ currency }}</strong></h5></div>
                         </div>
                         <hr />
                         <div class="row">
                             <div class="col-5"> </div>
                             <div class="col-4"><h5>{{ 'service_checkout.cart.table.subtotal'|trans }}</h5></div>
-                            <div class="col-3"><h5 class="text-right"><strong><span id="subtotal-price">{{ productPrice|number_format(2, '.', '\'') }}</span> {{ currency }}</strong></h5></div>
+                            <div class="col-3"><h5 class="text-right"><strong><span class="js-subtotal">{{ productPrice|number_format(2, '.', '\'') }}</span> {{ currency }}</strong></h5></div>
                         </div>
                         <hr />
                         <div class="row">
                             <div class="col-5"> </div>
                             <div class="col-4"><h5>{{ 'service_checkout.cart.table.shipping'|trans }}</h5></div>
-                            <div class="col-3"><h5 class="text-right"><strong><span id="output-shipping">{{ deliveryPrice|number_format(2, '.', '\'') }}</span> {{ currency }}</strong></h5></div>
+                            <div class="col-3"><h5 class="text-right"><strong><span class="js-shipping-price">{{ deliveryPrice|number_format(2, '.', '\'') }}</span> {{ currency }}</strong></h5></div>
                         </div>
                         <hr />
                         <div class="row">
                             <div class="col-5"> </div>
                             <div class="col-3"><h3>{{ 'service_checkout.cart.table.total'|trans }}</h3></div>
-                            <div class="col-4"><h3 class="text-right"><strong><span id="output-price">{{ fullPrice|number_format(2, '.', '\'') }}</span> {{ currency }}</strong></h3></div>
-                            <input type="hidden" name="output-price" value="{{ fullPrice }}" />
+                            <div class="col-4"><h3 class="text-right"><strong><span class="js-total-price">{{ fullPrice|number_format(2, '.', '\'') }}</span> {{ currency }}</strong></h3></div>
+                            <input type="hidden" name="price" value="{{ fullPrice }}" />
                         </div>
                     {% else %}
                         <p class="text-center text-warning"><b>{{ 'service_checkout.cart.empty'|trans }}</b></p>
