@@ -176,6 +176,8 @@ service_product:
     comments: 'Comments'
     comments_empty: "There aren't any comments. Be the first!"
     stars: 'Stars'
+    messages:
+        product_added: 'Your product was added to the cart'
     time:
         seconds_ago: 'second(s) ago'
         minutes_ago: 'minute(s) ago'
@@ -200,6 +202,10 @@ service_product:
             label: 'Write a review'
 service_checkout:
     title: 'Checkout'
+    messages:
+        order_sent: 'We saved your order in our system, and sent you a confirmation. We will deliver you the products as soon as possible.'
+        order_sent_no_mail: "We saved your order in our system, but couldn't send you a confirmation. We will deliver you the products as soon as possible."
+        order_not_sent: "It looks like, we couldn't create a transaction with your given credit card information. Try again!"
     voucher:
         voucher: 'Voucher'
         check: 'Check!'

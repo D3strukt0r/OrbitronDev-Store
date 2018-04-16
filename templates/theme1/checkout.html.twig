@@ -23,26 +23,27 @@
     {{ parent() }}
     <script>
         $(document).ready(function() {
-            // Has to be executed beacause google maps changes this automatically to "off"
-            $("#pac-input").attr('autocomplete', 'nope');
+            // Has to be executed because google maps changes this automatically to "off"
+            $('#pac-input').attr('autocomplete', 'nope');
         });
 
-        var placeSearch, autocomplete;
-        var componentForm = {
-            street_number: 'short_name',
-            route: 'long_name',
-            locality: 'long_name',
-            //administrative_area_level_1: 'short_name',
-            country: 'long_name',
-            postal_code: 'short_name'
-        };
-        var input_ids = {
-            street_number: 'checkout_location_street_number',
-            route: 'checkout_location_street',
-            locality: 'checkout_location_city',
-            country: 'checkout_location_country',
-            postal_code: 'checkout_location_postal_code'
-        };
+        let placeSearch,
+            autocomplete,
+            componentForm = {
+                street_number: 'short_name',
+                route: 'long_name',
+                locality: 'long_name',
+                //administrative_area_level_1: 'short_name',
+                country: 'long_name',
+                postal_code: 'short_name',
+            },
+            input_ids = {
+                street_number: 'checkout_location_street_number',
+                route: 'checkout_location_street',
+                locality: 'checkout_location_city',
+                country: 'checkout_location_country',
+                postal_code: 'checkout_location_postal_code',
+            };
 
         function initAutocomplete() {
             // Create the autocomplete object, restricting the search to geographical
@@ -59,7 +60,7 @@
         // [START region_fillform]
         function fillInAddress() {
             // Get the place details from the autocomplete object.
-            var place = autocomplete.getPlace();
+            let place = autocomplete.getPlace();
 
             /** Not Required as can be predefined by user
              for (var component in componentForm) {
@@ -69,10 +70,10 @@
              */
             // Get each component of the address from the place details
             // and fill the corresponding field on the form.
-            for (var i = 0; i < place.address_components.length; i++) {
-                var addressType = place.address_components[i].types[0];
+            for (let i = 0; i < place.address_components.length; i++) {
+                let addressType = place.address_components[i].types[0];
                 if (componentForm[addressType]) {
-                    var val = place.address_components[i][componentForm[addressType]];
+                    let val = place.address_components[i][componentForm[addressType]];
                     console.log(input_ids[addressType]);
                     document.getElementById(input_ids[addressType]).value = val;
                 }
@@ -86,11 +87,11 @@
         function geolocate() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
-                    var geolocation = {
+                    let geolocation = {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
-                    var circle = new google.maps.Circle({
+                    let circle = new google.maps.Circle({
                         center: geolocation,
                         radius: position.coords.accuracy
                     });
@@ -140,10 +141,16 @@
                 // Override defaults
                 $.extend(true, this.options, options);
 
-                // Set clear_checkout listener
+                // Set clear checkout listener
                 this.options.cart.clear_cart.click({'checkout': this}, function(event) {
                     event.preventDefault();
                     event.data.checkout.clearCart();
+                });
+
+                // Set remove product listener
+                this.options.cart.remove_product.click({'checkout': this}, function(event) {
+                    event.preventDefault();
+                    event.data.checkout.removeProduct($(this).data('product'));
                 });
 
                 // Set the quantity change listener
@@ -202,34 +209,40 @@
                 if (this.options.debug) console.log('Clearing cart...');
                 $.ajax({
                     url: this.options.cart.clear_cart_url,
-                    type: 'GET'
+                    method: 'GET',
                 }).done(function(data) {
-                    location.reload();
+                    if(data.result === 'true') {
+                        Checkout.createSuccessNotification('Your cart has been cleared');
+                        location.reload();
+                    } else {
+                        Checkout.createFailureNotification('The product could not be removed, try again.');
+                    }
                 }).fail(function() {
-                    Checkout.createFailureNotification('Could not clear cart');
+                    Checkout.createFailureNotification('Server Error, try again.');
                 });
             }
 
             removeProduct(productId, count) {
-                count = count || 0;
-
+                let data = { product: productId, response: 'json' };
+                if (Number.isInteger(count)) {
+                    data.product_count = count;
+                }
+                if (this.options.debug) console.log('Removing product with id ' + productId + '...');
                 $.ajax({
-                    method: 'POST',
                     url: this.options.cart.remove_product_url,
-                    data: { product: productId, product_count: count, response: 'json' },
-                    async: true,
+                    method: 'POST',
+                    data: data,
                     beforeSend: function(xhr) {
                         xhr.overrideMimeType('text/plain; charset=x-user-defined');
                     }
                 }).done(function(data) {
-                    let response = JSON.parse(data);
-                    if(response['result'] === 'true') {
-                        Checkout.createSuccessNotification('[Checkout] Product deleted');
+                    if(data.result === 'true') {
+                        Checkout.createSuccessNotification('The product has been removed from your cart');
                     } else {
-                        Checkout.createFailureNotification('Product couldn\'t be removed, try again.');
+                        Checkout.createFailureNotification('The product could not be removed, try again.');
                     }
                 }).fail(function() {
-                    Checkout.createFailureNotification('Product couldn\'t be removed, try again.');
+                    Checkout.createFailureNotification('Server Error, try again.');
                 });
             }
 
@@ -237,40 +250,35 @@
                 this.options.voucher.loading.show();
                 $.ajax({
                     url: this.options.voucher.check_voucher_url,
-                    type: 'GET',
-                    data: { code : this.options.voucher.voucher_code.val() }
+                    method: 'GET',
+                    data: { code: this.options.voucher.voucher_code.val() }
                 }).done(function(data) {
                     checkout.options.voucher.loading.hide();
-                    let validation = $(data).find('result').first().text();
-                    if(validation === 'invalid') {
+                    if(data.result === 'invalid') {
                         Checkout.createFailureNotification('{{ 'service_checkout.voucher.invalid'|trans }}');
                     }
-                    else if(validation === 'valid') {
-                        let reduceType = parseInt($(data).find('type').first().text(), 10);
-                        let amount = $(data).find('amount').first().text();
-                        let code = $(data).find('code').first().text();
-
+                    else if(data.result === 'valid') {
+                        // Check whether the code has already been used
                         let codeExists = false;
                         $('.js-voucher-codes').each(function() {
-                            if ($(this).text() === code) {
+                            if ($(this).text() === data.code) {
                                 codeExists = true;
                             }
                         });
                         if (codeExists) {
-                            Checkout.createFailureNotification('{{ 'service_checkout.voucher.invalid'|trans }}');
+                            Checkout.createFailureNotification('Code has already been added');
                             return;
                         }
 
                         Checkout.createSuccessNotification('{{ 'service_checkout.voucher.valid'|trans }}');
 
                         checkout.options.voucher.table.show();
-                        checkout.addVoucher(reduceType, amount, code);
+                        checkout.addVoucher(parseInt(data.type, 10), data.amount, data.code);
 
                         checkout.updateTotal();
                     }
                 }).fail(function() {
-                    Checkout.createFailureNotification('{{ 'service_checkout.voucher.invalid'|trans }}');
-                    if (this.options.debug) console.error('Ajax failed for voucher check!');
+                    Checkout.createFailureNotification('Server Error, try again.');
                 });
             }
 
@@ -390,8 +398,8 @@
             },
             'cart': {
                 'clear_cart': $('.js-clear-checkout'),
-                'clear_cart_url': '{{ path('store_do_clear_cart', {'store': current_store.url}) }}',
-                'remove_product': null,
+                'clear_cart_url': '{{ path('store_do_clear_cart', {'store': current_store.url, 'response': 'json'}) }}',
+                'remove_product': $('.js-remove-product'),
                 'remove_product_url': '{{ path('store_do_remove_from_cart', {'store': current_store.url}) }}',
                 'product_quantity': $('.js-product-quantity'),
                 'total_each_product': $('.js-product-quantity-total'),
@@ -464,13 +472,13 @@
             {% for message in app.session.flashbag.get('order_sent') %}
             <div id="order-sent" class="alert alert-success alert-dismissible" role="alert">
                 <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{{ 'service_general.close'|trans }}</span></button>
-                {{ message }}
+                {{ message|trans }}
             </div>
             {% endfor %}
             {% for message in app.session.flashbag.get('order_not_sent') %}
             <div id="order-not-sent" class="alert alert-danger alert-dismissible" role="alert">
                 <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{{ 'service_general.close'|trans }}</span></button>
-                {{ message }}
+                {{ message|trans }}
             </div>
             {% endfor %}
             {% set message_no_products_availbale = app.session.flashbag.get('products_unavailable') %}
@@ -478,7 +486,7 @@
                 <div id="products-unavailable" class="alert alert-danger alert-dismissible" role="alert">
                     <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{{ 'service_general.close'|trans }}</span></button>
                     {% for message in message_no_products_availbale %}
-                        <p>{{ message }}</p>
+                        <p>{{ message|trans }}</p>
                     {% endfor %}
                 </div>
             {% endif %}
@@ -580,7 +588,7 @@
             <div id="cart" class="card mb-2">
                 <div class="card-body">
                     <label>{{ 'service_checkout.cart.title'|trans }}</label>
-                    <span class="pull-right"><a href="#" class="btn btn-danger btn-sm js-clear-checkout">{{ 'service_checkout.cart.clear'|trans }}</a></span>
+                    <span class="pull-right"><a href="{{ path('store_do_clear_cart', {'store': current_store.url}) }}" class="btn btn-danger btn-sm js-clear-checkout">{{ 'service_checkout.cart.clear'|trans }}</a></span>
                     {% if cart|length > 0 %}
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -657,7 +665,7 @@
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                <a href="{{ path('store_do_remove_from_cart', {'store': current_store.url, 'product': product.id}) }}" class="btn btn-danger"><i class="fa fa-times" aria-hidden="true"></i> {{ 'service_checkout.cart.table.remove'|trans }}</a>
+                                                <a href="{{ path('store_do_remove_from_cart', {'store': current_store.url, 'product': product.id}) }}" class="btn btn-danger js-remove-product" data-product="{{ product.id }}"><i class="fa fa-times" aria-hidden="true"></i> {{ 'service_checkout.cart.table.remove'|trans }}</a>
                                             </td>
                                         </tr>
                                         {% if product.in_sale %}

@@ -65,25 +65,59 @@
     {{ parent() }}
     <script src="https://cdn.jsdelivr.net/gh/dobtco/starrr@2/dist/starrr.min.js"></script>
     <script>
-        $('#product-count').change(function() {
-            var price = {{ current_product.price(currency) }};
-            var $price = $("#output-price");
-            var $price_sale = $("#output-price-sale");
-            var $count = $('#product-count');
-            $price.html("<b>" + number_format(price * $count.val(), 2, '.', '\'') + " {{ currency }}</b>");
-            if($price_sale.length !== 0) {
-                var sale = {% if current_product.inSale(currency) %}{{ current_product.salePrice(currency) }}{% else %}null{% endif %};
-                $price_sale.html("<b>" + number_format(sale * $count.val(), 2, '.', '\'') + " {{ currency }}</b>");
+        class Product {
+            constructor(options) {
+                this.options = {
+                    'price': 0,
+                    'currency': 'USD',
+                    'el_price': null,
+                    'el_price_sale': null,
+                    'el_quantity': null,
+                };
+                // Override defaults
+                $.extend(true, this.options, options);
+
+                // Set product quantity listener
+                this.options.el_quantity.change({product: this}, function(event) {
+                    let options = event.data.product.options;
+
+                    // Update price
+                    let price = 0;
+                    if (options.price === 0) {
+                        price = 'Free';
+                    } else {
+                        price = number_format(options.price * options.el_quantity.val(), 2, '.', '\'') + ' ' + options.currency;
+                    }
+                    options.el_price.html('<b>' + price + '</b>');
+
+                    // Update sale price
+                    if(options.price_sale !== 0) {
+                        let price_sale = 0;
+                        if (options.price_sale === 0) {
+                            price_sale = 'Free';
+                        } else {
+                            price_sale = number_format(options.price_sale * options.el_quantity.val(), 2, '.', '\'') + ' ' + options.currency;
+                        }
+                        options.el_price_sale.html('<b>' + price_sale + '</b>');
+                    }
+                });
+
+                // Add rating functionality
+                $('.starrr').starrr({
+                    change: function(e, value) {
+                        $('#ratings-hidden').val(value);
+                    }
+                });
             }
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
-            $('.starrr').starrr({
-                change: function(e, value) {
-                    $('#ratings-hidden').val(value);
-                }
-            });
+        }
+
+        new Product({
+            'price': {{ current_product.price(currency) }},
+            'price_sale': {% if current_product.inSale(currency) %}{{ current_product.salePrice(currency) }}{% else %}null{% endif %},
+            'currency': '{{ currency }}',
+            'el_price': $('#output-price'),
+            'el_price_sale': $('#output-price-sale'),
+            'el_quantity': $('#product-count'),
         });
     </script>
 {% endblock %}
@@ -180,7 +214,7 @@
                                         <span class="help-block text-danger">{{ form_errors(add_to_cart_form.product_count) }}</span>
                                         <span class="help-block text-success">
                                             {% for message in app.session.flashbag.get('product_added') %}
-                                                {{ message }}
+                                                {{ message|trans }}
                                             {% endfor %}
                                         </span>
 

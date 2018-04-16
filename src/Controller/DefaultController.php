@@ -198,7 +198,7 @@ class DefaultController extends Controller
 
             $cartHelper->addToCart($product, $formData['product_count']);
 
-            $this->addFlash('product_added', 'Your product was added to the cart'); // TODO: Missing translation
+            $this->addFlash('product_added', 'service_product.messages.product_added');
         }
 
         // Add a review
@@ -392,12 +392,12 @@ class DefaultController extends Controller
                         $cartHelper->clearCart();
                         $cart = $cartHelper->getCart(true, true);
 
-                        $this->addFlash('order_sent', 'We saved your order in our system, and sent you a confirmation. We will deliver you the products as soon as possible.'); // TODO: Missing translation
+                        $this->addFlash('order_sent', 'service_checkout.messages.order_sent');
                     } else {
-                        $this->addFlash('order_not_sent', 'Your order was not sent. Try again!'); // TODO: Missing translation
+                        $this->addFlash('order_not_sent', 'service_checkout.messages.order_sent_no_mail');
                     }
                 } else {
-                    $this->addFlash('order_not_sent', 'It looks like, we couldn\'t create a transaction with your given credit card information. Try again!'); // TODO: Missing translation
+                    $this->addFlash('order_not_sent', 'service_checkout.messages.order_not_sent');
                 }
             }
         }
@@ -427,23 +427,21 @@ class DefaultController extends Controller
         /** @var \App\Entity\Voucher $voucher */
         $voucher = $em->getRepository(Voucher::class)->findOneBy(['store' => $store, 'code' => $request->query->get('code')]);
 
-        $result = new \SimpleXMLElement('<root></root>');
         if (null === $voucher) {
-            $result->addChild('result', 'invalid');
-        } else {
-            $result->addChild('result', 'valid');
-            $result->addChild('code', $voucher->getCode());
-            $result->addChild('type', $voucher->getType());
-            $result->addChild('amount', $voucher->getAmount());
+            return $this->json([
+                'result' => 'invalid',
+            ]);
         }
-        $response = new Response();
-        $response->headers->set('Content-Type', 'text/xml');
-        $response->setContent($result->asXML());
 
-        return $response;
+        return $this->json([
+            'result' => 'valid',
+            'code' => $voucher->getCode(),
+            'type' => $voucher->getType(),
+            'amount' => $voucher->getAmount(),
+        ]);
     }
 
-    public function storeDoClearCart(ObjectManager $em, CartHelper $cartHelper, $store)
+    public function storeDoClearCart(ObjectManager $em, Request $request, CartHelper $cartHelper, $store)
     {
         //////////// TEST IF STORE EXISTS ////////////
         /** @var \App\Entity\Store $store */
@@ -459,7 +457,20 @@ class DefaultController extends Controller
         $cartHelper->initialise($store, $user);
         $cartHelper->clearCart();
 
-        return '';
+        $responseType = $request->get('response', null);
+        $browser = $request->get('browser', null);
+        if (null !== $responseType) {
+            if ('json' === $responseType) {
+                return $this->json([
+                    'result' => 'true',
+                ]);
+            }
+        }
+        if (null === $browser || (null !== $browser && true === $browser)) {
+            return $this->redirect($request->server->get('HTTP_REFERER'), 302);
+        }
+
+        return new Response();
     }
 
     public function storeDoAddToCart(ObjectManager $em, Request $request, CartHelper $cartHelper, $store)
@@ -494,7 +505,7 @@ class DefaultController extends Controller
             return $this->redirect($request->server->get('HTTP_REFERER'), 302);
         }
 
-        return '';
+        return new Response();
     }
 
     public function storeDoRemoveFromCart(ObjectManager $em, Request $request, CartHelper $cartHelper, $store)
