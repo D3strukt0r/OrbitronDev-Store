@@ -175,6 +175,14 @@
                 this.options.voucher.check_voucher.click({'checkout': this}, function(event) {
                     event.data.checkout.checkVoucher();
                 });
+
+                // Set transport method change listener
+                $('#transport').find('input[type=radio]').on('change', {'checkout': this}, function(event) {
+                    let x = $('input[name=shipping]:checked', '#transport').data('cost');
+                    let new_shipping_price = parseFloat(x.match(/-?(?:\d+(?:\.\d*)?|\.\d+)/)[0]);
+                    $('.js-shipping-price').text(number_format(new_shipping_price, 2, '.', '\''));
+                    event.data.updateTotal();
+                });
             }
 
             static createSuccessNotification(text) {
@@ -411,40 +419,6 @@
                 'total_input': $('[name=price]')
             },
         });
-    </script>
-    <script>
-        // DELIVERY FUNCTIONALITY
-        {# TODO: Delivery is still problematic #}
-        let elShippingMethod = $('input[name=shipping]:checked', '#transport');
-        let elShippingCost = $('.js-shipping-price');
-        let elFormPriceHidden = $('[name=price]');
-        let elFormPrice = $('.js-total-price');
-
-        let transport_price, new_transport_price = 0, form_price, form_new_price = 0;
-        transport_price = parseFloat($('input[name=shipping]:checked', '#transport').data('cost'));
-        if (isNaN(transport_price)) {
-            transport_price = parseFloat($('.js-shipping-price').text());
-        }
-        form_price = parseFloat($('[name=price]').val());
-
-        $('#transport').find('input[type=radio]').on('change', function() {
-            new_transport_price = parseFloat($('input[name=shipping]:checked', '#transport').data('cost'));
-            form_new_price = form_price - transport_price + new_transport_price;
-            /*
-              if (!isNaN(old_price))
-              old_price = price;
-              console.log(old_price);
-              price = parseFloat(elShippingMethod.data('cost'));
-              console.log(price);
-              var form_old_price = parseFloat(elFormPriceHidden.val());
-              console.log(form_old_price);
-              var form_new_price = form_old_price - old_price + price;
-              console.log(form_new_price);
-*/
-            $('[name=price]').val(form_new_price);
-            $('.js-total-price').text(number_format(form_new_price, 2, '.', '\''));
-        });
-
     </script>
 {% endblock %}
 
