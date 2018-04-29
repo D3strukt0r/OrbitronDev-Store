@@ -201,7 +201,7 @@
                         <div class="g-pos-rel g-px-10--lg">
                             <a id="profileMenuInvoker" class="d-block" href="#!" aria-controls="profileMenu" aria-haspopup="true" aria-expanded="false" data-dropdown-event="click" data-dropdown-target="#profileMenu" data-dropdown-type="css-animation" data-dropdown-duration="300" data-dropdown-animation-in="fadeIn" data-dropdown-animation-out="fadeOut">
                                 <span class="g-pos-rel">
-                                    <img class="g-width-30 g-width-40--md g-height-30 g-height-40--md rounded-circle g-mr-10--sm" src="http://account.localhost/api/get_img?user_id={{ app.user.id }}&height=100&width=100" alt="Image description">
+                                    <img class="g-width-30 g-width-40--md g-height-30 g-height-40--md rounded-circle g-mr-10--sm" src="{{ getenv('OAUTH_URL') }}/api/get_img?user_id={{ app.user.id }}&height=100&width=100" alt="Image description">
                                 </span>
                                 <span class="g-pos-rel g-top-2">
                                     <span class="g-hidden-sm-down">{{ 'admin.nav.quick_links'|trans }}</span>
@@ -288,21 +288,11 @@
                         <!-- Footer Nav -->
                         <div class="col-md-4 g-mb-10 g-mb-0--md">
                             <ul class="list-inline text-center text-md-left mb-0">
-                                <li class="list-inline-item">
-                                    <a class="g-color-gray-dark-v6 g-color-lightblue-v3--hover" href="#!">FAQ</a>
-                                </li>
-                                <li class="list-inline-item">
-                                    <span class="g-color-gray-dark-v6">|</span>
-                                </li>
-                                <li class="list-inline-item">
-                                    <a class="g-color-gray-dark-v6 g-color-lightblue-v3--hover" href="#!">Support</a>
-                                </li>
-                                <li class="list-inline-item">
-                                    <span class="g-color-gray-dark-v6">|</span>
-                                </li>
-                                <li class="list-inline-item">
-                                    <a class="g-color-gray-dark-v6 g-color-lightblue-v3--hover" href="#!">Contact Us</a>
-                                </li>
+                                <li class="list-inline-item"><a class="g-color-gray-dark-v6 g-color-lightblue-v3--hover" href="#!">{{ 'admin.faq'|trans }}</a></li>
+                                <li class="list-inline-item"><span class="g-color-gray-dark-v6">|</span></li>
+                                <li class="list-inline-item"><a class="g-color-gray-dark-v6 g-color-lightblue-v3--hover" href="#!">{{ 'admin.support'|trans }}</a></li>
+                                <li class="list-inline-item"><span class="g-color-gray-dark-v6">|</span></li>
+                                <li class="list-inline-item"><a class="g-color-gray-dark-v6 g-color-lightblue-v3--hover" href="#!">{{ 'admin.contact'|trans }}</a></li>
                             </ul>
                         </div>
                         <!-- End Footer Nav -->
@@ -311,22 +301,22 @@
                         <div class="col-md-4 g-mb-10 g-mb-0--md">
                             <ul class="list-inline g-font-size-16 text-center mb-0">
                                 <li class="list-inline-item g-mx-10">
-                                    <a href="#!" class="g-color-facebook g-color-lightblue-v3--hover">
+                                    <a href="https://www.facebook.com/manuele.vaccari" class="g-color-facebook g-color-lightblue-v3--hover">
                                         <i class="fa fa-facebook-square"></i>
                                     </a>
                                 </li>
                                 <li class="list-inline-item g-mx-10">
-                                    <a href="#!" class="g-color-twitter g-color-lightblue-v3--hover">
+                                    <a href="https://twitter.com/ManueleVaccari" class="g-color-twitter g-color-lightblue-v3--hover">
                                         <i class="fa fa-twitter"></i>
                                     </a>
                                 </li>
                                 <li class="list-inline-item g-mx-10">
-                                    <a href="#!" class="g-color-google-plus g-color-lightblue-v3--hover">
+                                    <a href="https://plus.google.com/+ManueleVaccari" class="g-color-google-plus g-color-lightblue-v3--hover">
                                         <i class="fa fa-google-plus"></i>
                                     </a>
                                 </li>
                                 <li class="list-inline-item g-mx-10">
-                                    <a href="https://github.com/OrbitronDev/service-account" class="g-color-black g-color-lightblue-v3--hover">
+                                    <a href="https://github.com/D3strukt0r/service-store" class="g-color-black g-color-lightblue-v3--hover">
                                         <i class="fa fa-github"></i>
                                     </a>
                                 </li>
