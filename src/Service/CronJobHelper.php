@@ -24,6 +24,9 @@ class CronJobHelper
         $this->kernel = $kernel;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function execute()
     {
         $cronJobs = $this->em->getRepository(CronJob::class)->findBy(['enabled' => true], ['priority' => 'ASC']);
@@ -69,7 +72,7 @@ class CronJobHelper
                 $job->setLastExec(new \DateTime());
                 $this->em->flush();
             } else {
-                throw new \Exception('[CronJob][Fatal Error]: Could not execute cron job. Could not locate script file ("'.$fileDir.'")');
+                throw new \Exception('[CronJob][Fatal Error]: Could not execute cron job. Could not locate script file ("'.$job->getScriptFile().'")');
             }
         }
     }
