@@ -47,14 +47,10 @@ class CronJobHelper
      */
     public function getNextExec(CronJob $job)
     {
-        if ($job) {
-            $lastExec = $job->getLastExec()->getTimestamp();
-            $execEvery = $job->getExecEvery();
+        $lastExec = $job->getLastExec()->getTimestamp();
+        $execEvery = $job->getExecEvery();
 
-            return $lastExec + $execEvery;
-        }
-
-        return -1;
+        return $lastExec + $execEvery;
     }
 
     /**
@@ -64,16 +60,14 @@ class CronJobHelper
      */
     public function runJob(CronJob $job)
     {
-        if ($job) {
-            $className = '\\App\\Service\\CronJob\\'.$job->getScriptFile();
-            if (class_exists($className)) {
-                new $className($this->kernel);
+        $className = '\\App\\Service\\CronJob\\'.$job->getScriptFile();
+        if (class_exists($className)) {
+            new $className($this->kernel);
 
-                $job->setLastExec(new \DateTime());
-                $this->em->flush();
-            } else {
-                throw new \Exception('[CronJob][Fatal Error]: Could not execute cron job. Could not locate script file ("'.$job->getScriptFile().'")');
-            }
+            $job->setLastExec(new \DateTime());
+            $this->em->flush();
+        } else {
+            throw new \Exception('[CronJob][Fatal Error]: Could not execute cron job. Could not locate script file ("'.$job->getScriptFile().'")');
         }
     }
 }

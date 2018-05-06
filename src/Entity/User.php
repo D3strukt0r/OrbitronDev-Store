@@ -37,6 +37,12 @@ class User implements \Serializable, UserInterface
      */
     protected $token_data;
 
+    /**
+     * @var string|null
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $locale;
+
     protected $password = '';
 
     /**
@@ -167,5 +173,25 @@ class User implements \Serializable, UserInterface
             // see section on salt below
             // $this->salt
             ) = unserialize($serialized);
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    /**
+     * @param null|string $locale
+     *
+     * @return $this
+     */
+    public function setLocale(?string $locale = null): self
+    {
+        $this->locale = $locale;
+
+        return $this;
     }
 }

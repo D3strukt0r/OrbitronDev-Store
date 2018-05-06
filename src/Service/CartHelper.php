@@ -161,10 +161,10 @@ class CartHelper
     /**
      * Remove a product from the cart.
      *
-     * @param int  $product_id (Required) to know which product
-     * @param null $count      (Optional) Amount to be removed
+     * @param int      $product_id (Required) to know which product
+     * @param int|null $count      (Optional) Amount to be removed
      */
-    public function removeFromCart(int $product_id, $count = null): void
+    public function removeFromCart(int $product_id, ?int $count = null): void
     {
         if (!$this->initialised) {
             return;

@@ -213,10 +213,6 @@ class Product
      */
     public function setName(string $name, string $language): self
     {
-        if (!is_array($this->name)) {
-            $this->name = [];
-        }
-
         $array = new ArrayCollection($this->name);
         $array->set($language, $name);
         $this->name = $array->toArray();
@@ -231,10 +227,6 @@ class Product
      */
     public function removeName(string $language): self
     {
-        if (!is_array($this->name)) {
-            $this->name = [];
-        }
-
         $array = new ArrayCollection($this->name);
         if ($array->containsKey($language)) {
             $array->remove($language);
@@ -278,10 +270,6 @@ class Product
      */
     public function setDescription(string $description, string $language): self
     {
-        if (!is_array($this->description)) {
-            $this->description = [];
-        }
-
         $array = new ArrayCollection($this->description);
         $array->set($language, $description);
         $this->description = $array->toArray();
@@ -296,10 +284,6 @@ class Product
      */
     public function removeDescription(string $language): self
     {
-        if (!is_array($this->description)) {
-            $this->description = [];
-        }
-
         $array = new ArrayCollection($this->description);
         if ($array->containsKey($language)) {
             $array->remove($language);
@@ -343,10 +327,6 @@ class Product
      */
     public function setShortDescription(string $description, string $language): self
     {
-        if (!is_array($this->short_description)) {
-            $this->short_description = [];
-        }
-
         $array = new ArrayCollection($this->short_description);
         $array->set($language, $description);
         $this->short_description = $array->toArray();
@@ -361,10 +341,6 @@ class Product
      */
     public function removeShortDescription(string $language): self
     {
-        if (!is_array($this->short_description)) {
-            $this->short_description = [];
-        }
-
         $array = new ArrayCollection($this->short_description);
         if ($array->containsKey($language)) {
             $array->remove($language);
@@ -408,10 +384,6 @@ class Product
      */
     public function setPrice(float $price, string $currency): self
     {
-        if (!is_array($this->price)) {
-            $this->price = [];
-        }
-
         $array = new ArrayCollection($this->price);
         $array->set($currency, $price);
         $this->price = $array->toArray();
@@ -426,10 +398,6 @@ class Product
      */
     public function removePrice(string $currency): self
     {
-        if (!is_array($this->price)) {
-            $this->price = [];
-        }
-
         $array = new ArrayCollection($this->price);
         if ($array->containsKey($currency)) {
             $array->remove($currency);
@@ -490,10 +458,6 @@ class Product
      */
     public function setSalePrice(float $price, string $currency): self
     {
-        if (!is_array($this->price_sale)) {
-            $this->price_sale = [];
-        }
-
         $array = new ArrayCollection($this->price_sale);
         $array->set($currency, $price);
         $this->price_sale = $array->toArray();
@@ -508,10 +472,6 @@ class Product
      */
     public function removeSalePrice(string $currency): self
     {
-        if (!is_array($this->price_sale)) {
-            $this->price_sale = [];
-        }
-
         $array = new ArrayCollection($this->price_sale);
         if ($array->containsKey($currency)) {
             $array->remove($currency);

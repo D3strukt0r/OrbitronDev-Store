@@ -42,7 +42,7 @@ class ModeratorController extends Controller
 
     public function advertisement($navigation, $store)
     {
-        return $response = $this->forward('App\\Controller\\Panel\\DefaultController::notFound', [
+        return $this->forward('App\\Controller\\Panel\\DefaultController::notFound', [
             'navigation' => $navigation,
             'store' => $store,
         ]);
@@ -50,7 +50,7 @@ class ModeratorController extends Controller
 
     public function modTools($navigation, $store)
     {
-        return $response = $this->forward('App\\Controller\\Panel\\DefaultController::notFound', [
+        return $this->forward('App\\Controller\\Panel\\DefaultController::notFound', [
             'navigation' => $navigation,
             'store' => $store,
         ]);

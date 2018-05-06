@@ -99,7 +99,7 @@ class ECBCurrencyConverter
     /**
      * @param string $currency
      *
-     * @return float
+     * @return float|string
      */
     private function getRate($currency)
     {
@@ -122,12 +122,12 @@ class ECBCurrencyConverter
      * @param string $to       (Optional) To which currency should be converted. Default is USD.
      * @param int    $decimals (Optional) How much decimals should the number have
      *
-     * @return float
+     * @return string
      */
-    public function convert(float $amount, string $from, string $to = 'USD', int $decimals = 2): float
+    public function convert(float $amount, string $from, string $to = 'USD', int $decimals = 2): string
     {
         if (!file_exists($this->sCachedFile)) {
-            self::download($this->sCachedFile);
+            $this->download($this->sCachedFile);
         }
 
         if ('currency_does_not_exists' === $this->getRate($from) || ('EUR' !== mb_strtoupper($to) && 'currency_does_not_exists' === $this->getRate($to))) {

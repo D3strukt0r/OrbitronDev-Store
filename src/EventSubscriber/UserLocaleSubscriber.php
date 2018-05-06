@@ -25,11 +25,9 @@ class UserLocaleSubscriber implements EventSubscriberInterface
         /** @var \App\Entity\User $user */
         $user = $event->getAuthenticationToken()->getUser();
 
-        /* TODO: Activate user locale
         if (null !== $user->getLocale()) {
             $this->session->set('_locale', $user->getLocale());
         }
-        */
     }
 
     public static function getSubscribedEvents()

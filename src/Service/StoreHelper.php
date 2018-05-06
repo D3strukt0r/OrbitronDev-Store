@@ -40,10 +40,8 @@ class StoreHelper
         /** @var \App\Entity\Store[] $find */
         $find = $this->em->getRepository(Store::class)->findBy(['url' => $url]);
 
-        if (null !== $find) {
-            if (count($find)) {
-                return true;
-            }
+        if (count($find)) {
+            return true;
         }
 
         return false;
