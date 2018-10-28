@@ -125,6 +125,11 @@ class Product
 
     public function __construct()
     {
+        $this->name = new ArrayCollection();
+        $this->description = new ArrayCollection();
+        $this->short_description = new ArrayCollection();
+        $this->price = new ArrayCollection();
+        $this->price_sale = new ArrayCollection();
         $this->images = new ArrayCollection();
         $this->files = new ArrayCollection();
         $this->ratings = new ArrayCollection();
@@ -186,7 +191,7 @@ class Product
      */
     public function getName(string $language): ?string
     {
-        $array = new ArrayCollection($this->name);
+        $array = ($this->name instanceof ArrayCollection ? $this->name : new ArrayCollection($this->name));
         if ($array->containsKey($language)) {
             return $array->get($language);
         }
@@ -213,7 +218,7 @@ class Product
      */
     public function setName(string $name, string $language): self
     {
-        $array = new ArrayCollection($this->name);
+        $array = ($this->name instanceof ArrayCollection ? $this->name : new ArrayCollection($this->name));
         $array->set($language, $name);
         $this->name = $array->toArray();
 
@@ -227,7 +232,7 @@ class Product
      */
     public function removeName(string $language): self
     {
-        $array = new ArrayCollection($this->name);
+        $array = ($this->name instanceof ArrayCollection ? $this->name : new ArrayCollection($this->name));
         if ($array->containsKey($language)) {
             $array->remove($language);
             $this->name = $array->toArray();
@@ -243,7 +248,7 @@ class Product
      */
     public function getDescription(string $language): ?string
     {
-        $array = new ArrayCollection($this->description);
+        $array = ($this->description instanceof ArrayCollection ? $this->description : new ArrayCollection($this->description));
         if ($array->containsKey($language)) {
             return $array->get($language);
         }
@@ -270,7 +275,7 @@ class Product
      */
     public function setDescription(string $description, string $language): self
     {
-        $array = new ArrayCollection($this->description);
+        $array = ($this->description instanceof ArrayCollection ? $this->description : new ArrayCollection($this->description));
         $array->set($language, $description);
         $this->description = $array->toArray();
 
@@ -284,7 +289,7 @@ class Product
      */
     public function removeDescription(string $language): self
     {
-        $array = new ArrayCollection($this->description);
+        $array = ($this->description instanceof ArrayCollection ? $this->description : new ArrayCollection($this->description));
         if ($array->containsKey($language)) {
             $array->remove($language);
             $this->description = $array->toArray();
@@ -300,7 +305,7 @@ class Product
      */
     public function getShortDescription(string $language): ?string
     {
-        $array = new ArrayCollection($this->short_description);
+        $array = ($this->short_description instanceof ArrayCollection ? $this->short_description : new ArrayCollection($this->short_description));
         if ($array->containsKey($language)) {
             return $array->get($language);
         }
@@ -327,7 +332,7 @@ class Product
      */
     public function setShortDescription(string $description, string $language): self
     {
-        $array = new ArrayCollection($this->short_description);
+        $array = ($this->short_description instanceof ArrayCollection ? $this->short_description : new ArrayCollection($this->short_description));
         $array->set($language, $description);
         $this->short_description = $array->toArray();
 
@@ -341,7 +346,7 @@ class Product
      */
     public function removeShortDescription(string $language): self
     {
-        $array = new ArrayCollection($this->short_description);
+        $array = ($this->short_description instanceof ArrayCollection ? $this->short_description : new ArrayCollection($this->short_description));
         if ($array->containsKey($language)) {
             $array->remove($language);
             $this->short_description = $array->toArray();
@@ -357,7 +362,7 @@ class Product
      */
     public function getPrice(string $currency): ?string
     {
-        $array = new ArrayCollection($this->price);
+        $array = ($this->price instanceof ArrayCollection ? $this->price : new ArrayCollection($this->price));
         if ($array->containsKey($currency)) {
             return $array->get($currency);
         }
@@ -384,7 +389,7 @@ class Product
      */
     public function setPrice(float $price, string $currency): self
     {
-        $array = new ArrayCollection($this->price);
+        $array = ($this->price instanceof ArrayCollection ? $this->price : new ArrayCollection($this->price));
         $array->set($currency, $price);
         $this->price = $array->toArray();
 
@@ -398,7 +403,7 @@ class Product
      */
     public function removePrice(string $currency): self
     {
-        $array = new ArrayCollection($this->price);
+        $array = ($this->price instanceof ArrayCollection ? $this->price : new ArrayCollection($this->price));
         if ($array->containsKey($currency)) {
             $array->remove($currency);
             $this->price = $array->toArray();
@@ -414,7 +419,7 @@ class Product
      */
     public function getSalePrice(string $currency): ?string
     {
-        $array = new ArrayCollection($this->price_sale);
+        $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection($this->price_sale));
         if ($array->containsKey($currency)) {
             return $array->get($currency);
         }
@@ -441,7 +446,7 @@ class Product
     public function isInSale(string $currency): bool
     {
         if (null !== $this->price_sale) {
-            $array = new ArrayCollection($this->price_sale);
+            $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection($this->price_sale));
             if ($array->containsKey($currency)) {
                 return true;
             }
@@ -458,7 +463,7 @@ class Product
      */
     public function setSalePrice(float $price, string $currency): self
     {
-        $array = new ArrayCollection($this->price_sale);
+        $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection($this->price_sale));
         $array->set($currency, $price);
         $this->price_sale = $array->toArray();
 
@@ -472,7 +477,7 @@ class Product
      */
     public function removeSalePrice(string $currency): self
     {
-        $array = new ArrayCollection($this->price_sale);
+        $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection($this->price_sale));
         if ($array->containsKey($currency)) {
             $array->remove($currency);
             $this->price_sale = $array->toArray();
