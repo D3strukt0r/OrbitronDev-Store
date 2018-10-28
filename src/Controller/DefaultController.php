@@ -276,17 +276,20 @@ class DefaultController extends Controller
         $cartHelper->initialise($store, $user);
         $cart = $cartHelper->getCart(true, false);
 
-        $userData = $this->getDataFromToken(true);
-        $activeAddress = null !== $userData ? $userData->getActiveAddress() : null;
-        $checkoutFormData = [
-            'name' => (null !== $userData ? $userData->getFirstName() : '').' '.(null !== $userData ? $userData->getSurname() : ''),
-            'email' => null !== $userData ? $userData->getEmail() : '',
-            'location_street' => null !== $activeAddress ? $activeAddress['street'] : '',
-            'location_street_number' => null !== $activeAddress ? $activeAddress['house_number'] : '',
-            'location_postal_code' => null !== $activeAddress ? $activeAddress['zip_code'] : '',
-            'location_city' => null !== $activeAddress ? $activeAddress['city'] : '',
-            'location_country' => null !== $activeAddress ? $activeAddress['country'] : '',
-        ];
+        $checkoutFormData = [];
+        if ($user) {
+            $userData = $this->getDataFromToken(true);
+            $activeAddress = null !== $userData ? $userData->getActiveAddress() : null;
+            $checkoutFormData = [
+                'name' => (null !== $userData ? $userData->getFirstName() : '').' '.(null !== $userData ? $userData->getSurname() : ''),
+                'email' => null !== $userData ? $userData->getEmail() : '',
+                'location_street' => null !== $activeAddress ? $activeAddress['street'] : '',
+                'location_street_number' => null !== $activeAddress ? $activeAddress['house_number'] : '',
+                'location_postal_code' => null !== $activeAddress ? $activeAddress['zip_code'] : '',
+                'location_city' => null !== $activeAddress ? $activeAddress['city'] : '',
+                'location_country' => null !== $activeAddress ? $activeAddress['country'] : '',
+            ];
+        }
         $checkoutForm = $this->createForm(CheckoutType::class, null, $checkoutFormData);
 
         /** @var \App\Entity\StorePaymentMethods[] $paymentTypes */
