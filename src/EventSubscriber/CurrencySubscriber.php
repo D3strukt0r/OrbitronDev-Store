@@ -20,9 +20,6 @@ class CurrencySubscriber implements EventSubscriberInterface
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!$request->hasPreviousSession()) {
-            return;
-        }
 
         // try to see if the currency has been set as a _currency routing parameter or is present as a cookie
         if ($currency = $request->attributes->get('_currency')) {
@@ -33,7 +30,6 @@ class CurrencySubscriber implements EventSubscriberInterface
             $request->attributes->set('set_currency_cookie', $currency);
         } elseif ($currency = $request->cookies->get('_currency')) {
             $request->getSession()->set('_currency', $currency);
-            $request->attributes->set('set_currency_cookie', $currency);
         } else {
             // if no explicit currency has been set on this request, use one from the cookie
             $request->getSession()->set('_currency', $this->defaultCurrency);
