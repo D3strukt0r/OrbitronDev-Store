@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -38,7 +40,7 @@ class Store
     protected $email;
 
     /**
-     * @var \App\Entity\User
+     * @var User
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=false)
      */
@@ -99,13 +101,13 @@ class Store
     protected $copyright;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      * @ORM\Column(type="datetime")
      */
     protected $created;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var Collection
      * @ORM\OneToMany(targetEntity="Product", mappedBy="store", cascade={"persist", "remove"}, orphanRemoval=true)
      */
     protected $products;
@@ -117,8 +119,13 @@ class Store
     protected $active_payment_method;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
-     * @ORM\OneToMany(targetEntity="StorePaymentMethods", mappedBy="store", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @var Collection
+     * @ORM\OneToMany(
+     *     targetEntity="StorePaymentMethods",
+     *     mappedBy="store",
+     *     cascade={"persist", "remove"},
+     *     orphanRemoval=true
+     * )
      */
     protected $paymentMethods;
 
@@ -140,7 +147,7 @@ class Store
     }
 
     /**
-     * @return int
+     * @return int The ID
      */
     public function getId(): int
     {
@@ -148,7 +155,7 @@ class Store
     }
 
     /**
-     * @return string
+     * @return string The name
      */
     public function getName(): string
     {
@@ -156,7 +163,7 @@ class Store
     }
 
     /**
-     * @param string $name
+     * @param string $name The name
      *
      * @return $this
      */
@@ -168,7 +175,7 @@ class Store
     }
 
     /**
-     * @return string
+     * @return string The url
      */
     public function getUrl(): string
     {
@@ -176,7 +183,7 @@ class Store
     }
 
     /**
-     * @param string $url
+     * @param string $url The url
      *
      * @return $this
      */
@@ -188,7 +195,7 @@ class Store
     }
 
     /**
-     * @return string
+     * @return string The contact email
      */
     public function getEmail(): string
     {
@@ -196,7 +203,7 @@ class Store
     }
 
     /**
-     * @param string $email
+     * @param string $email The contact email
      *
      * @return $this
      */
@@ -208,7 +215,7 @@ class Store
     }
 
     /**
-     * @return \App\Entity\User
+     * @return User The owner
      */
     public function getOwner(): User
     {
@@ -216,7 +223,7 @@ class Store
     }
 
     /**
-     * @param \App\Entity\User $owner
+     * @param User $owner The owner
      *
      * @return $this
      */
@@ -228,7 +235,7 @@ class Store
     }
 
     /**
-     * @return bool
+     * @return bool Whether the store is closed
      */
     public function isClosed(): bool
     {
@@ -236,7 +243,7 @@ class Store
     }
 
     /**
-     * @param bool $closed
+     * @param bool $closed Whether the store is closed
      *
      * @return $this
      */
@@ -248,7 +255,7 @@ class Store
     }
 
     /**
-     * @return string|null
+     * @return string|null The message why the store was closed
      */
     public function getClosedMessage(): ?string
     {
@@ -256,7 +263,7 @@ class Store
     }
 
     /**
-     * @param string|null $closed_message
+     * @param string|null $closed_message The message why the store was closed
      *
      * @return $this
      */
@@ -268,7 +275,7 @@ class Store
     }
 
     /**
-     * @return null|array
+     * @return array|null The keywords
      */
     public function getKeywords(): ?array
     {
@@ -276,7 +283,7 @@ class Store
     }
 
     /**
-     * @param string $keyword
+     * @param string $keyword The keyword
      *
      * @return $this
      */
@@ -294,7 +301,7 @@ class Store
     }
 
     /**
-     * @param string $keyword
+     * @param string $keyword The keyword
      *
      * @return $this
      */
@@ -314,7 +321,7 @@ class Store
     }
 
     /**
-     * @return string|null
+     * @return string|null The description
      */
     public function getDescription(): ?string
     {
@@ -322,7 +329,7 @@ class Store
     }
 
     /**
-     * @param string|null $description
+     * @param string|null $description The description
      *
      * @return $this
      */
@@ -334,7 +341,7 @@ class Store
     }
 
     /**
-     * @return string|null
+     * @return string|null The Google Analytics ID
      */
     public function getGoogleAnalyticsId(): ?string
     {
@@ -342,7 +349,7 @@ class Store
     }
 
     /**
-     * @param string|null $id
+     * @param string|null $id The Google Analytics ID
      *
      * @return $this
      */
@@ -354,7 +361,7 @@ class Store
     }
 
     /**
-     * @return string|null
+     * @return string|null The Google Web Developer ID
      */
     public function getGoogleWebDeveloper(): ?string
     {
@@ -362,7 +369,7 @@ class Store
     }
 
     /**
-     * @param string|null $google_web_dev
+     * @param string|null $google_web_dev The Google Web Developer ID
      *
      * @return $this
      */
@@ -374,7 +381,7 @@ class Store
     }
 
     /**
-     * @return array|null
+     * @return array|null The links
      */
     public function getLinks(): ?array
     {
@@ -382,7 +389,7 @@ class Store
     }
 
     /**
-     * @param array|null $links
+     * @param array|null $links The links
      *
      * @return $this
      */
@@ -394,7 +401,7 @@ class Store
     }
 
     /**
-     * @return string|null
+     * @return string|null The language
      */
     public function getLanguage(): ?string
     {
@@ -402,7 +409,7 @@ class Store
     }
 
     /**
-     * @param string|null $language
+     * @param string|null $language The language
      *
      * @return $this
      */
@@ -414,7 +421,7 @@ class Store
     }
 
     /**
-     * @return string|null
+     * @return string|null The copyright notice
      */
     public function getCopyright(): ?string
     {
@@ -422,7 +429,7 @@ class Store
     }
 
     /**
-     * @param string|null $copyright
+     * @param string|null $copyright The copyright notice
      *
      * @return $this
      */
@@ -434,19 +441,19 @@ class Store
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime The date of creation
      */
-    public function getCreated(): \DateTime
+    public function getCreated(): DateTime
     {
         return $this->created;
     }
 
     /**
-     * @param \DateTime $created
+     * @param DateTime $created The date of creation
      *
      * @return $this
      */
-    public function setCreated(\DateTime $created): self
+    public function setCreated(DateTime $created): self
     {
         $this->created = $created;
 
@@ -454,7 +461,7 @@ class Store
     }
 
     /**
-     * @return \App\Entity\Product[]
+     * @return Product[] The products
      */
     public function getProducts(): array
     {
@@ -462,7 +469,7 @@ class Store
     }
 
     /**
-     * @param \App\Entity\Product $product
+     * @param Product $product The product
      *
      * @return $this
      */
@@ -475,7 +482,7 @@ class Store
     }
 
     /**
-     * @param \App\Entity\Product $product
+     * @param Product $product The product
      *
      * @return $this
      */
@@ -489,7 +496,7 @@ class Store
     }
 
     /**
-     * @return int|null
+     * @return int|null The active payment method
      */
     public function getActivePaymentMethod(): ?int
     {
@@ -497,7 +504,7 @@ class Store
     }
 
     /**
-     * @param int|null $activePaymentMethod
+     * @param int|null $activePaymentMethod The active payment method
      *
      * @return $this
      */
@@ -509,7 +516,7 @@ class Store
     }
 
     /**
-     * @return \App\Entity\StorePaymentMethods[]
+     * @return StorePaymentMethods[] The payment methods
      */
     public function getPaymentMethods(): array
     {
@@ -517,7 +524,7 @@ class Store
     }
 
     /**
-     * @param \App\Entity\StorePaymentMethods $paymentMethod
+     * @param StorePaymentMethods $paymentMethod The payment method
      *
      * @return $this
      */
@@ -530,7 +537,7 @@ class Store
     }
 
     /**
-     * @param \App\Entity\StorePaymentMethods $paymentMethod
+     * @param StorePaymentMethods $paymentMethod The payment method
      *
      * @return $this
      */
@@ -544,7 +551,7 @@ class Store
     }
 
     /**
-     * @return string
+     * @return string The default language
      */
     public function getDefaultLanguage(): string
     {
@@ -552,7 +559,7 @@ class Store
     }
 
     /**
-     * @param string $default_language
+     * @param string $default_language The default language
      *
      * @return $this
      */
@@ -564,7 +571,7 @@ class Store
     }
 
     /**
-     * @return string
+     * @return string The default currency
      */
     public function getDefaultCurrency(): string
     {
@@ -572,7 +579,7 @@ class Store
     }
 
     /**
-     * @param string $default_currency
+     * @param string $default_currency The default currency
      *
      * @return $this
      */
@@ -584,7 +591,7 @@ class Store
     }
 
     /**
-     * @return array
+     * @return array An array of all the properties in an object
      */
     public function toArray(): array
     {

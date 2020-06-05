@@ -42,7 +42,7 @@
 namespace App\Service;
 
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ECBCurrencyConverter
 {
@@ -50,12 +50,12 @@ class ECBCurrencyConverter
     private $sCachedFile = '/var/data/currency/currency-data.xml';
 
     /**
-     * @var \Symfony\Component\Translation\TranslatorInterface
+     * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var \Symfony\Component\HttpKernel\KernelInterface
+     * @var KernelInterface
      */
     private $kernel;
 
@@ -86,15 +86,44 @@ class ECBCurrencyConverter
         return false;
     }
 
+    /**
+     * Perform the actual conversion
+     * Hint: Base is EUR, so everything is converted to EUR and then to the given currency.
+     *
+     * @param float  $amount   (Required) How much should be converted
+     * @param string $from     (Required) From which currency should be converted
+     * @param string $to       (Optional) To which currency should be converted. Default is USD.
+     * @param int    $decimals (Optional) How much decimals should the number have
+     *
+     * @return string The converted string
+     */
+    public function convert(float $amount, string $from, string $to = 'USD', int $decimals = 2): string
+    {
+        if (!file_exists($this->sCachedFile)) {
+            $this->download($this->sCachedFile);
+        }
+
+        if ('currency_does_not_exists' === $this->getRate($from) || ('EUR' !== mb_strtoupper(
+                    $to
+                ) && 'currency_does_not_exists' === $this->getRate($to))) {
+            return $this->translator->trans('Currency not found');
+        }
+
+        $currency = $amount / $this->getRate($from);
+        if ('EUR' !== mb_strtoupper($to)) {
+            $currency = $currency * $this->getRate($to);
+        }
+
+        return number_format($currency, $decimals);
+    }
+
     private function download($save_to)
     {
         if (!file_exists(dirname($save_to))) {
-            mkdir(dirname($save_to), 0777, true);
+            mkdir(dirname($save_to), 0755, true);
         }
         file_put_contents($save_to, fopen($this->sXmlFile, 'r'));
     }
-
-    /***********************************************************************************/
 
     /**
      * @param string $currency
@@ -111,34 +140,5 @@ class ECBCurrencyConverter
         }
 
         return 'currency_does_not_exists';
-    }
-
-    /**
-     * Perform the actual conversion
-     * Hint: Base is EUR, so everything is converted to EUR and then to the given currency.
-     *
-     * @param float  $amount   (Required) How much should be converted
-     * @param string $from     (Required) From which currency should be converted
-     * @param string $to       (Optional) To which currency should be converted. Default is USD.
-     * @param int    $decimals (Optional) How much decimals should the number have
-     *
-     * @return string
-     */
-    public function convert(float $amount, string $from, string $to = 'USD', int $decimals = 2): string
-    {
-        if (!file_exists($this->sCachedFile)) {
-            $this->download($this->sCachedFile);
-        }
-
-        if ('currency_does_not_exists' === $this->getRate($from) || ('EUR' !== mb_strtoupper($to) && 'currency_does_not_exists' === $this->getRate($to))) {
-            return $this->translator->trans('Currency not found');
-        }
-
-        $currency = $amount / $this->getRate($from);
-        if ('EUR' !== mb_strtoupper($to)) {
-            $currency = $currency * $this->getRate($to);
-        }
-
-        return number_format($currency, $decimals);
     }
 }

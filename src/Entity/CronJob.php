@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -37,7 +38,7 @@ class CronJob
     protected $script_file;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      * @ORM\Column(type="datetime")
      */
     protected $last_exec;
@@ -49,7 +50,7 @@ class CronJob
     protected $exec_every = 3600;
 
     /**
-     * @return int
+     * @return int The ID
      */
     public function getId(): int
     {
@@ -57,7 +58,7 @@ class CronJob
     }
 
     /**
-     * @return bool
+     * @return bool Whether the job is enabled
      */
     public function isEnabled(): bool
     {
@@ -65,7 +66,7 @@ class CronJob
     }
 
     /**
-     * @param bool $enabled
+     * @param bool $enabled Whether the job is enabled
      *
      * @return $this
      */
@@ -77,7 +78,7 @@ class CronJob
     }
 
     /**
-     * @return int
+     * @return int The priority
      */
     public function getPriority(): int
     {
@@ -85,7 +86,7 @@ class CronJob
     }
 
     /**
-     * @param int $priority
+     * @param int $priority The priority
      *
      * @return $this
      */
@@ -97,7 +98,7 @@ class CronJob
     }
 
     /**
-     * @return string
+     * @return string The script to run
      */
     public function getScriptFile(): string
     {
@@ -105,7 +106,7 @@ class CronJob
     }
 
     /**
-     * @param string $script_file
+     * @param string $script_file The script to run
      *
      * @return $this
      */
@@ -117,19 +118,19 @@ class CronJob
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime Last execution time
      */
-    public function getLastExec(): \DateTime
+    public function getLastExec(): DateTime
     {
         return $this->last_exec;
     }
 
     /**
-     * @param \DateTime $last_exec
+     * @param DateTime $last_exec Last execution time
      *
      * @return $this
      */
-    public function setLastExec(\DateTime $last_exec): self
+    public function setLastExec(DateTime $last_exec): self
     {
         $this->last_exec = $last_exec;
 
@@ -137,7 +138,7 @@ class CronJob
     }
 
     /**
-     * @return int
+     * @return int Exec every "how many seconds"
      */
     public function getExecEvery(): int
     {
@@ -145,7 +146,7 @@ class CronJob
     }
 
     /**
-     * @param int $exec_every
+     * @param int $exec_every Exec every "how many seconds"
      *
      * @return $this
      */

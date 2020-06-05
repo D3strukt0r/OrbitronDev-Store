@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -20,14 +22,14 @@ class Product
     protected $id;
 
     /**
-     * @var \App\Entity\Store
+     * @var Store
      * @ORM\ManyToOne(targetEntity="Store", inversedBy="products")
      * @ORM\JoinColumn(name="store_id", referencedColumnName="id", nullable=false)
      */
     protected $store;
 
     /**
-     * @var \App\Entity\User
+     * @var User
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=false)
      */
@@ -70,8 +72,13 @@ class Product
     protected $small_icon;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
-     * @ORM\OneToMany(targetEntity="ProductImages", mappedBy="product", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @var Collection
+     * @ORM\OneToMany(
+     *     targetEntity="ProductImages",
+     *     mappedBy="product",
+     *     cascade={"persist", "remove"},
+     *     orphanRemoval=true
+     * )
      */
     protected $images;
 
@@ -82,7 +89,7 @@ class Product
     protected $downloadable = false;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var Collection
      * @ORM\OneToMany(targetEntity="ProductFile", mappedBy="product", cascade={"persist", "remove"}, orphanRemoval=true)
      */
     protected $files;
@@ -94,7 +101,7 @@ class Product
     protected $stock = 0;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      * @ORM\Column(type="datetime")
      */
     protected $last_edited;
@@ -118,8 +125,13 @@ class Product
     protected $rating_average = 0;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
-     * @ORM\OneToMany(targetEntity="ProductRating", mappedBy="product", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @var Collection
+     * @ORM\OneToMany(
+     *     targetEntity="ProductRating",
+     *     mappedBy="product",
+     *     cascade={"persist", "remove"},
+     *     orphanRemoval=true
+     * )
      */
     protected $ratings;
 
@@ -133,11 +145,11 @@ class Product
         $this->images = new ArrayCollection();
         $this->files = new ArrayCollection();
         $this->ratings = new ArrayCollection();
-        $this->last_edited = new \DateTime();
+        $this->last_edited = new DateTime();
     }
 
     /**
-     * @return int
+     * @return int The ID
      */
     public function getId(): int
     {
@@ -145,7 +157,7 @@ class Product
     }
 
     /**
-     * @return \App\Entity\Store
+     * @return Store The store
      */
     public function getStore(): Store
     {
@@ -153,7 +165,7 @@ class Product
     }
 
     /**
-     * @param \App\Entity\Store $store
+     * @param Store $store The store
      *
      * @return $this
      */
@@ -165,7 +177,7 @@ class Product
     }
 
     /**
-     * @return \App\Entity\User
+     * @return User The owner
      */
     public function getOwner(): User
     {
@@ -173,7 +185,7 @@ class Product
     }
 
     /**
-     * @param \App\Entity\User $owner
+     * @param User $owner The owner
      *
      * @return $this
      */
@@ -185,9 +197,9 @@ class Product
     }
 
     /**
-     * @param string $language
+     * @param string $language The language
      *
-     * @return null|string
+     * @return string|null The name
      */
     public function getName(string $language): ?string
     {
@@ -203,7 +215,7 @@ class Product
     }
 
     /**
-     * @return array
+     * @return array The names
      */
     public function getNames(): array
     {
@@ -211,8 +223,8 @@ class Product
     }
 
     /**
-     * @param string $name
-     * @param string $language
+     * @param string $name     The name
+     * @param string $language The language
      *
      * @return $this
      */
@@ -226,7 +238,7 @@ class Product
     }
 
     /**
-     * @param string $language
+     * @param string $language The language
      *
      * @return $this
      */
@@ -242,13 +254,15 @@ class Product
     }
 
     /**
-     * @param string $language
+     * @param string $language The language
      *
-     * @return null|string
+     * @return string|null The description
      */
     public function getDescription(string $language): ?string
     {
-        $array = ($this->description instanceof ArrayCollection ? $this->description : new ArrayCollection($this->description));
+        $array = ($this->description instanceof ArrayCollection ? $this->description : new ArrayCollection(
+            $this->description
+        ));
         if ($array->containsKey($language)) {
             return $array->get($language);
         }
@@ -260,7 +274,7 @@ class Product
     }
 
     /**
-     * @return array
+     * @return array The descriptions
      */
     public function getDescriptions(): array
     {
@@ -268,14 +282,16 @@ class Product
     }
 
     /**
-     * @param string $description
-     * @param string $language
+     * @param string $description The description
+     * @param string $language    The language
      *
      * @return $this
      */
     public function setDescription(string $description, string $language): self
     {
-        $array = ($this->description instanceof ArrayCollection ? $this->description : new ArrayCollection($this->description));
+        $array = ($this->description instanceof ArrayCollection ? $this->description : new ArrayCollection(
+            $this->description
+        ));
         $array->set($language, $description);
         $this->description = $array->toArray();
 
@@ -283,13 +299,15 @@ class Product
     }
 
     /**
-     * @param string $language
+     * @param string $language The language
      *
      * @return $this
      */
     public function removeDescription(string $language): self
     {
-        $array = ($this->description instanceof ArrayCollection ? $this->description : new ArrayCollection($this->description));
+        $array = ($this->description instanceof ArrayCollection ? $this->description : new ArrayCollection(
+            $this->description
+        ));
         if ($array->containsKey($language)) {
             $array->remove($language);
             $this->description = $array->toArray();
@@ -299,13 +317,15 @@ class Product
     }
 
     /**
-     * @param string $language
+     * @param string $language The language
      *
-     * @return null|string
+     * @return string|null The short description
      */
     public function getShortDescription(string $language): ?string
     {
-        $array = ($this->short_description instanceof ArrayCollection ? $this->short_description : new ArrayCollection($this->short_description));
+        $array = ($this->short_description instanceof ArrayCollection ? $this->short_description : new ArrayCollection(
+            $this->short_description
+        ));
         if ($array->containsKey($language)) {
             return $array->get($language);
         }
@@ -317,7 +337,7 @@ class Product
     }
 
     /**
-     * @return array
+     * @return array An array of the short descriptions
      */
     public function getShortDescriptions(): array
     {
@@ -325,14 +345,16 @@ class Product
     }
 
     /**
-     * @param string $description
-     * @param string $language
+     * @param string $description The description
+     * @param string $language    The language
      *
      * @return $this
      */
     public function setShortDescription(string $description, string $language): self
     {
-        $array = ($this->short_description instanceof ArrayCollection ? $this->short_description : new ArrayCollection($this->short_description));
+        $array = ($this->short_description instanceof ArrayCollection ? $this->short_description : new ArrayCollection(
+            $this->short_description
+        ));
         $array->set($language, $description);
         $this->short_description = $array->toArray();
 
@@ -340,13 +362,15 @@ class Product
     }
 
     /**
-     * @param string $language
+     * @param string $language The language
      *
      * @return $this
      */
     public function removeShortDescription(string $language): self
     {
-        $array = ($this->short_description instanceof ArrayCollection ? $this->short_description : new ArrayCollection($this->short_description));
+        $array = ($this->short_description instanceof ArrayCollection ? $this->short_description : new ArrayCollection(
+            $this->short_description
+        ));
         if ($array->containsKey($language)) {
             $array->remove($language);
             $this->short_description = $array->toArray();
@@ -356,9 +380,9 @@ class Product
     }
 
     /**
-     * @param string $currency
+     * @param string $currency The currency
      *
-     * @return null|string
+     * @return string|null The price
      */
     public function getPrice(string $currency): ?string
     {
@@ -374,7 +398,7 @@ class Product
     }
 
     /**
-     * @return array
+     * @return array The prices
      */
     public function getPrices(): array
     {
@@ -382,8 +406,8 @@ class Product
     }
 
     /**
-     * @param float  $price
-     * @param string $currency
+     * @param float  $price    The price
+     * @param string $currency The currency
      *
      * @return $this
      */
@@ -397,7 +421,7 @@ class Product
     }
 
     /**
-     * @param string $currency
+     * @param string $currency The currency
      *
      * @return $this
      */
@@ -413,13 +437,15 @@ class Product
     }
 
     /**
-     * @param string $currency
+     * @param string $currency The currency
      *
-     * @return null|string
+     * @return string|null The sale price
      */
     public function getSalePrice(string $currency): ?string
     {
-        $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection($this->price_sale));
+        $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection(
+            $this->price_sale
+        ));
         if ($array->containsKey($currency)) {
             return $array->get($currency);
         }
@@ -431,7 +457,7 @@ class Product
     }
 
     /**
-     * @return array
+     * @return array The sale prices
      */
     public function getSalePrices(): array
     {
@@ -439,14 +465,16 @@ class Product
     }
 
     /**
-     * @param string $currency
+     * @param string $currency The currency
      *
-     * @return bool
+     * @return bool Whether the product is in sale
      */
     public function isInSale(string $currency): bool
     {
         if (null !== $this->price_sale) {
-            $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection($this->price_sale));
+            $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection(
+                $this->price_sale
+            ));
             if ($array->containsKey($currency)) {
                 return true;
             }
@@ -456,14 +484,16 @@ class Product
     }
 
     /**
-     * @param float  $price
-     * @param string $currency
+     * @param float  $price    The price
+     * @param string $currency The currency
      *
      * @return $this
      */
     public function setSalePrice(float $price, string $currency): self
     {
-        $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection($this->price_sale));
+        $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection(
+            $this->price_sale
+        ));
         $array->set($currency, $price);
         $this->price_sale = $array->toArray();
 
@@ -471,13 +501,15 @@ class Product
     }
 
     /**
-     * @param string $currency
+     * @param string $currency The currency
      *
      * @return $this
      */
     public function removeSalePrice(string $currency): self
     {
-        $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection($this->price_sale));
+        $array = ($this->price_sale instanceof ArrayCollection ? $this->price_sale : new ArrayCollection(
+            $this->price_sale
+        ));
         if ($array->containsKey($currency)) {
             $array->remove($currency);
             $this->price_sale = $array->toArray();
@@ -487,7 +519,7 @@ class Product
     }
 
     /**
-     * @return string|null
+     * @return string|null The small icon url
      */
     public function getSmallIcon(): ?string
     {
@@ -495,7 +527,7 @@ class Product
     }
 
     /**
-     * @param string|null $small_icon
+     * @param string|null $small_icon The small icon url
      *
      * @return $this
      */
@@ -507,7 +539,7 @@ class Product
     }
 
     /**
-     * @return \App\Entity\ProductImages[]
+     * @return ProductImages[] The product images
      */
     public function getImages(): array
     {
@@ -515,7 +547,7 @@ class Product
     }
 
     /**
-     * @param \App\Entity\ProductImages $image
+     * @param ProductImages $image The product image
      *
      * @return $this
      */
@@ -528,7 +560,7 @@ class Product
     }
 
     /**
-     * @param \App\Entity\ProductImages $image
+     * @param ProductImages $image The product image
      *
      * @return $this
      */
@@ -542,7 +574,7 @@ class Product
     }
 
     /**
-     * @return bool
+     * @return bool Whether it's a downloadable file
      */
     public function getDownloadable(): bool
     {
@@ -550,7 +582,7 @@ class Product
     }
 
     /**
-     * @param bool $downloadable
+     * @param bool $downloadable Whether it's a downloadable file
      *
      * @return $this
      */
@@ -562,7 +594,7 @@ class Product
     }
 
     /**
-     * @return \App\Entity\ProductFile[]
+     * @return ProductFile[] The files
      */
     public function getFiles(): array
     {
@@ -570,7 +602,7 @@ class Product
     }
 
     /**
-     * @param \App\Entity\ProductFile $file
+     * @param ProductFile $file The files
      *
      * @return $this
      */
@@ -583,7 +615,7 @@ class Product
     }
 
     /**
-     * @param \App\Entity\ProductFile $file
+     * @param ProductFile $file The files
      *
      * @return $this
      */
@@ -597,7 +629,7 @@ class Product
     }
 
     /**
-     * @return int
+     * @return int The available stock
      */
     public function getStock(): int
     {
@@ -605,7 +637,7 @@ class Product
     }
 
     /**
-     * @param int $stock
+     * @param int $stock The available stock
      *
      * @return $this
      */
@@ -617,19 +649,19 @@ class Product
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime The last time the product was edited
      */
-    public function getLastEdited(): \DateTime
+    public function getLastEdited(): DateTime
     {
         return $this->last_edited;
     }
 
     /**
-     * @param \DateTime $lastEdited
+     * @param DateTime $lastEdited The last time the product was edited
      *
      * @return $this
      */
-    public function setLastEdited(\DateTime $lastEdited): self
+    public function setLastEdited(DateTime $lastEdited): self
     {
         $this->last_edited = $lastEdited;
 
@@ -637,7 +669,7 @@ class Product
     }
 
     /**
-     * @return bool
+     * @return bool Whether the product was closed
      */
     public function isClosed(): bool
     {
@@ -645,7 +677,7 @@ class Product
     }
 
     /**
-     * @param bool $closed
+     * @param bool $closed Whether the product was closed
      *
      * @return $this
      */
@@ -657,7 +689,7 @@ class Product
     }
 
     /**
-     * @return int
+     * @return int The rating
      */
     public function getRatingCount(): int
     {
@@ -665,7 +697,7 @@ class Product
     }
 
     /**
-     * @param $ratingCount
+     * @param int $ratingCount The rating
      *
      * @return $this
      */
@@ -677,7 +709,7 @@ class Product
     }
 
     /**
-     * @return float
+     * @return float The rating average
      */
     public function getRatingAverage(): float
     {
@@ -685,7 +717,7 @@ class Product
     }
 
     /**
-     * @param float $ratingAverage
+     * @param float $ratingAverage The rating average
      *
      * @return $this
      */
@@ -697,7 +729,7 @@ class Product
     }
 
     /**
-     * @return \App\Entity\ProductRating[]
+     * @return ProductRating[] The ratings
      */
     public function getRatings(): array
     {
@@ -705,7 +737,7 @@ class Product
     }
 
     /**
-     * @param \App\Entity\ProductRating $rating
+     * @param ProductRating $rating The rating
      *
      * @return $this
      */
@@ -718,7 +750,7 @@ class Product
     }
 
     /**
-     * @param \App\Entity\ProductRating $rating
+     * @param ProductRating $rating The rating
      *
      * @return $this
      */
@@ -732,7 +764,7 @@ class Product
     }
 
     /**
-     * @return string
+     * @return string The default language
      */
     public function getDefaultLanguage(): string
     {
@@ -740,7 +772,7 @@ class Product
     }
 
     /**
-     * @return string
+     * @return string The default currency
      */
     public function getDefaultCurrency(): string
     {
@@ -748,7 +780,7 @@ class Product
     }
 
     /**
-     * @return array
+     * @return array An array of all the properties in an object
      */
     public function toArray(): array
     {

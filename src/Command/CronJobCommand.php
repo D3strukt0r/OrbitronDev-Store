@@ -23,7 +23,8 @@ class CronJobCommand extends Command
         $this
             ->setName('app:cron:run')
             ->setDescription('Runs cron jobs')
-            ->setHelp('This command executes all cron job script who need to update');
+            ->setHelp('This command executes all cron job script who need to update')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

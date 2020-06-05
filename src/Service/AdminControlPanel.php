@@ -2,14 +2,10 @@
 
 namespace App\Service;
 
-use Psr\Container\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class AdminControlPanel
 {
-    private static $list = [];
-
-    private static $tree = [];
-
     const DEFAULT_GROUP = [
         'parent' => 'root',
         'id' => '',
@@ -29,6 +25,10 @@ class AdminControlPanel
             'tabindex' => -1,
         ],
     ];
+
+    private static $list = [];
+
+    private static $tree = [];
 
     /**
      * https://stackoverflow.com/a/27360654/4156752 (Thanks to Thunderstriker, arthur and basil).
@@ -58,12 +58,10 @@ class AdminControlPanel
             return $siblings;
         };
 
-        $tree = $fnBuilder($grouped['root']);
-
-        return $tree;
+        return $fnBuilder($grouped['root']);
     }
 
-    public static function loadLibs(string $rootDir, ContainerInterface $container = null)
+    public static function loadLibs(string $rootDir, TokenStorageInterface $tokenStorage = null)
     {
         $libraryDir = $rootDir.'/src/Controller/Panel';
 
@@ -80,7 +78,7 @@ class AdminControlPanel
         ksort(self::$list);
 
         foreach (self::$list as $class) {
-            $subTree = call_user_func($class.'::__setupNavigation', $container);
+            $subTree = call_user_func($class.'::__setupNavigation', $tokenStorage);
 
             $isMulti = function ($arr) {
                 foreach ($arr as $v) {

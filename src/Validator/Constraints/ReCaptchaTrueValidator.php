@@ -31,24 +31,24 @@ class ReCaptchaTrueValidator extends ConstraintValidator
     protected $requestStack;
 
     /**
-     * HTTP Proxy informations.
+     * HTTP Proxy information.
      *
      * @var array
      */
     protected $httpProxy;
 
     /**
-     * Enable serverside host check.
+     * Enable server side host check.
      *
      * @var bool
      */
     protected $verifyHost;
 
     /**
-     * @param bool         $enabled
-     * @param string       $privateKey
-     * @param RequestStack $requestStack
-     * @param bool         $verifyHost
+     * @param bool         $enabled      Whether ReCaptcha is enabled
+     * @param string       $privateKey   The private key
+     * @param RequestStack $requestStack The request stack
+     * @param bool         $verifyHost   Whether to verify the host
      */
     public function __construct($enabled, $privateKey, RequestStack $requestStack, $verifyHost)
     {

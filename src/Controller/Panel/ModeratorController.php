@@ -2,9 +2,10 @@
 
 namespace App\Controller\Panel;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use App\Entity\Store;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ModeratorController extends Controller
+class ModeratorController extends AbstractController
 {
     public static function __setupNavigation()
     {
@@ -40,19 +41,25 @@ class ModeratorController extends Controller
         return 10;
     }
 
-    public function advertisement($navigation, $store)
+    public function advertisement(Store $store, $navigation)
     {
-        return $this->forward('App\\Controller\\Panel\\DefaultController::notFound', [
-            'navigation' => $navigation,
-            'store' => $store,
-        ]);
+        return $this->forward(
+            'App\\Controller\\Panel\\DefaultController::notFound',
+            [
+                'navigation' => $navigation,
+                'store' => $store,
+            ]
+        );
     }
 
-    public function modTools($navigation, $store)
+    public function modTools(Store $store, $navigation)
     {
-        return $this->forward('App\\Controller\\Panel\\DefaultController::notFound', [
-            'navigation' => $navigation,
-            'store' => $store,
-        ]);
+        return $this->forward(
+            'App\\Controller\\Panel\\DefaultController::notFound',
+            [
+                'navigation' => $navigation,
+                'store' => $store,
+            ]
+        );
     }
 }

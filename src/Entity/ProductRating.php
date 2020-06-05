@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,14 +20,14 @@ class ProductRating
     protected $id;
 
     /**
-     * @var \App\Entity\Product
+     * @var Product
      * @ORM\ManyToOne(targetEntity="Product", inversedBy="ratings")
      * @ORM\JoinColumn(name="product_id", referencedColumnName="id", nullable=false)
      */
     protected $product;
 
     /**
-     * @var \App\Entity\User
+     * @var User
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
@@ -57,19 +58,19 @@ class ProductRating
     protected $spam = false;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      * @ORM\Column(type="datetime")
      */
     protected $created_on;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      * @ORM\Column(type="datetime")
      */
     protected $updated_on;
 
     /**
-     * @return int
+     * @return int The ID
      */
     public function getId(): int
     {
@@ -77,7 +78,7 @@ class ProductRating
     }
 
     /**
-     * @return \App\Entity\Product
+     * @return Product The product
      */
     public function getProduct(): Product
     {
@@ -85,7 +86,7 @@ class ProductRating
     }
 
     /**
-     * @param \App\Entity\Product $product
+     * @param Product $product The product
      *
      * @return $this
      */
@@ -97,7 +98,7 @@ class ProductRating
     }
 
     /**
-     * @return \App\Entity\User
+     * @return User The user
      */
     public function getUser(): User
     {
@@ -105,7 +106,7 @@ class ProductRating
     }
 
     /**
-     * @param \App\Entity\User $user
+     * @param User $user The user
      *
      * @return $this
      */
@@ -117,7 +118,7 @@ class ProductRating
     }
 
     /**
-     * @return int
+     * @return int The rating
      */
     public function getRating(): int
     {
@@ -125,7 +126,7 @@ class ProductRating
     }
 
     /**
-     * @param int $rating
+     * @param int $rating The rating
      *
      * @return $this
      */
@@ -137,7 +138,7 @@ class ProductRating
     }
 
     /**
-     * @return string
+     * @return string The comment
      */
     public function getComment(): string
     {
@@ -145,7 +146,7 @@ class ProductRating
     }
 
     /**
-     * @param string $comment
+     * @param string $comment The comment
      *
      * @return $this
      */
@@ -157,7 +158,7 @@ class ProductRating
     }
 
     /**
-     * @return bool
+     * @return bool Whether the comment is approved
      */
     public function isApproved(): bool
     {
@@ -165,7 +166,7 @@ class ProductRating
     }
 
     /**
-     * @param bool $approved
+     * @param bool $approved Whether the comment is approved
      *
      * @return $this
      */
@@ -177,7 +178,7 @@ class ProductRating
     }
 
     /**
-     * @return bool
+     * @return bool Whether the comment is spam
      */
     public function isSpam(): bool
     {
@@ -185,7 +186,7 @@ class ProductRating
     }
 
     /**
-     * @param bool $spam
+     * @param bool $spam Whether the comment is spam
      *
      * @return $this
      */
@@ -197,19 +198,19 @@ class ProductRating
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime When the rating was created
      */
-    public function getCreatedOn(): \DateTime
+    public function getCreatedOn(): DateTime
     {
         return $this->created_on;
     }
 
     /**
-     * @param \DateTime $createdOn
+     * @param DateTime $createdOn When the rating was created
      *
      * @return $this
      */
-    public function setCreatedOn(\DateTime $createdOn): self
+    public function setCreatedOn(DateTime $createdOn): self
     {
         $this->created_on = $createdOn;
 
@@ -217,19 +218,19 @@ class ProductRating
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime When the comment was last updated
      */
-    public function getUpdatedOn(): \DateTime
+    public function getUpdatedOn(): DateTime
     {
         return $this->updated_on;
     }
 
     /**
-     * @param \DateTime $updated_on
+     * @param DateTime $updated_on When the comment was last updated
      *
      * @return $this
      */
-    public function setUpdatedOn(\DateTime $updated_on): self
+    public function setUpdatedOn(DateTime $updated_on): self
     {
         $this->updated_on = $updated_on;
 

@@ -10,6 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Order
 {
+    const STATUS_NOT_PROCESSED = 0;
+    const STATUS_IN_PRODUCTION = 1;
+    const STATUS_SENT = 2;
+
     /**
      * @var int
      * @ORM\Id
@@ -19,7 +23,7 @@ class Order
     protected $id;
 
     /**
-     * @var \App\Entity\Store
+     * @var Store
      * @ORM\ManyToOne(targetEntity="Store")
      * @ORM\JoinColumn(name="store_id", referencedColumnName="id", nullable=false)
      */
@@ -68,7 +72,7 @@ class Order
     protected $country;
 
     /**
-     * @var \App\Entity\DeliveryType
+     * @var DeliveryType
      * @ORM\ManyToOne(targetEntity="DeliveryType")
      * @ORM\JoinColumn(name="delivery_type_id", referencedColumnName="id", nullable=false)
      */
@@ -86,12 +90,8 @@ class Order
      */
     protected $status = 0;
 
-    const STATUS_NOT_PROCESSED = 0;
-    const STATUS_IN_PRODUCTION = 1;
-    const STATUS_SENT = 2;
-
     /**
-     * @return int
+     * @return int The ID
      */
     public function getId(): int
     {
@@ -99,7 +99,7 @@ class Order
     }
 
     /**
-     * @return \App\Entity\Store
+     * @return Store The store
      */
     public function getStore(): Store
     {
@@ -107,7 +107,7 @@ class Order
     }
 
     /**
-     * @param \App\Entity\Store $store
+     * @param Store $store The store
      *
      * @return $this
      */
@@ -119,7 +119,7 @@ class Order
     }
 
     /**
-     * @return string
+     * @return string The name
      */
     public function getName(): string
     {
@@ -127,7 +127,7 @@ class Order
     }
 
     /**
-     * @param string $name
+     * @param string $name The name
      *
      * @return $this
      */
@@ -139,7 +139,7 @@ class Order
     }
 
     /**
-     * @return string
+     * @return string The email
      */
     public function getEmail(): string
     {
@@ -147,7 +147,7 @@ class Order
     }
 
     /**
-     * @param string $email
+     * @param string $email The email
      *
      * @return $this
      */
@@ -159,7 +159,7 @@ class Order
     }
 
     /**
-     * @return string
+     * @return string The phone
      */
     public function getPhone(): string
     {
@@ -167,7 +167,7 @@ class Order
     }
 
     /**
-     * @param string $phone
+     * @param string $phone The phone
      *
      * @return $this
      */
@@ -179,7 +179,7 @@ class Order
     }
 
     /**
-     * @return string
+     * @return string The street
      */
     public function getStreet(): string
     {
@@ -187,7 +187,7 @@ class Order
     }
 
     /**
-     * @param string $street
+     * @param string $street The street
      *
      * @return $this
      */
@@ -199,7 +199,7 @@ class Order
     }
 
     /**
-     * @return string
+     * @return string The zip code
      */
     public function getZipCode(): string
     {
@@ -207,7 +207,7 @@ class Order
     }
 
     /**
-     * @param string $zip_code
+     * @param string $zip_code The zip code
      *
      * @return $this
      */
@@ -219,7 +219,7 @@ class Order
     }
 
     /**
-     * @return string
+     * @return string The city
      */
     public function getCity(): string
     {
@@ -227,7 +227,7 @@ class Order
     }
 
     /**
-     * @param string $city
+     * @param string $city The city
      *
      * @return $this
      */
@@ -239,7 +239,7 @@ class Order
     }
 
     /**
-     * @return string
+     * @return string The country
      */
     public function getCountry(): string
     {
@@ -247,7 +247,7 @@ class Order
     }
 
     /**
-     * @param string $country
+     * @param string $country The country
      *
      * @return $this
      */
@@ -259,7 +259,7 @@ class Order
     }
 
     /**
-     * @return \App\Entity\DeliveryType
+     * @return DeliveryType The delivery type
      */
     public function getDeliveryType(): DeliveryType
     {
@@ -267,7 +267,7 @@ class Order
     }
 
     /**
-     * @param \App\Entity\DeliveryType $delivery_type
+     * @param DeliveryType $delivery_type The delivery type
      *
      * @return $this
      */
@@ -279,7 +279,7 @@ class Order
     }
 
     /**
-     * @return array
+     * @return array The product list
      */
     public function getProductList(): array
     {
@@ -287,7 +287,7 @@ class Order
     }
 
     /**
-     * @param array $product_list
+     * @param array $product_list The product list
      *
      * @return $this
      */
@@ -299,7 +299,7 @@ class Order
     }
 
     /**
-     * @return int
+     * @return int The status
      */
     public function getStatus(): int
     {
@@ -307,7 +307,7 @@ class Order
     }
 
     /**
-     * @param int $status
+     * @param int $status The status
      *
      * @return $this
      */

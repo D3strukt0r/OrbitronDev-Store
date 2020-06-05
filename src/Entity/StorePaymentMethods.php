@@ -10,6 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class StorePaymentMethods
 {
+    const TYPE_BRAINTREE_PRODUCTION = 'braintree_production';
+    const TYPE_BRAINTREE_SANDBOX = 'braintree_sandbox';
+
     /**
      * @var int
      * @ORM\Id
@@ -19,7 +22,7 @@ class StorePaymentMethods
     protected $id;
 
     /**
-     * @var \App\Entity\Store
+     * @var Store
      * @ORM\ManyToOne(targetEntity="Store", inversedBy="paymentMethods")
      * @ORM\JoinColumn(name="store_id", referencedColumnName="id", nullable=false)
      */
@@ -31,9 +34,6 @@ class StorePaymentMethods
      */
     protected $payment_type;
 
-    const TYPE_BRAINTREE_PRODUCTION = 'braintree_production';
-    const TYPE_BRAINTREE_SANDBOX = 'braintree_sandbox';
-
     /**
      * @var array
      * @ORM\Column(type="array")
@@ -41,7 +41,7 @@ class StorePaymentMethods
     protected $data;
 
     /**
-     * @return int
+     * @return int The ID
      */
     public function getId(): int
     {
@@ -49,7 +49,7 @@ class StorePaymentMethods
     }
 
     /**
-     * @return \App\Entity\Store
+     * @return Store The store
      */
     public function getStore(): Store
     {
@@ -57,7 +57,7 @@ class StorePaymentMethods
     }
 
     /**
-     * @param \App\Entity\Store $store
+     * @param Store $store The store
      *
      * @return $this
      */
@@ -69,7 +69,7 @@ class StorePaymentMethods
     }
 
     /**
-     * @return string
+     * @return string The type
      */
     public function getType(): string
     {
@@ -77,7 +77,7 @@ class StorePaymentMethods
     }
 
     /**
-     * @param string $type
+     * @param string $type The type
      *
      * @return $this
      */
@@ -89,7 +89,7 @@ class StorePaymentMethods
     }
 
     /**
-     * @return array
+     * @return array The data
      */
     public function getData(): array
     {
@@ -97,7 +97,7 @@ class StorePaymentMethods
     }
 
     /**
-     * @param array $data
+     * @param array $data The data
      *
      * @return $this
      */

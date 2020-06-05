@@ -3,29 +3,30 @@
 namespace App\Service;
 
 use App\Entity\CronJob;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class CronJobHelper
 {
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager
+     * @var EntityManagerInterface
      */
     private $em;
 
     /**
-     * @var \Symfony\Component\HttpKernel\KernelInterface
+     * @var KernelInterface
      */
     private $kernel;
 
-    public function __construct(ObjectManager $manager, KernelInterface $kernel)
+    public function __construct(EntityManagerInterface $manager, KernelInterface $kernel)
     {
         $this->em = $manager;
         $this->kernel = $kernel;
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute()
     {
@@ -41,7 +42,7 @@ class CronJobHelper
     }
 
     /**
-     * @param \App\Entity\CronJob $job
+     * @param CronJob $job The job
      *
      * @return int
      */
@@ -54,9 +55,9 @@ class CronJobHelper
     }
 
     /**
-     * @param \App\Entity\CronJob $job
+     * @param CronJob $job The job
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function runJob(CronJob $job)
     {
@@ -67,7 +68,7 @@ class CronJobHelper
             $job->setLastExec(new \DateTime());
             $this->em->flush();
         } else {
-            throw new \Exception('[CronJob][Fatal Error]: Could not execute cron job. Could not locate script file ("'.$job->getScriptFile().'")');
+            throw new Exception('[CronJob][Fatal Error]: Could not execute cron job. Could not locate script file ("'.$job->getScriptFile().'")');
         }
     }
 }

@@ -10,6 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Voucher
 {
+    const TYPE_PERCENTAGE = 0;
+    const TYPE_EXACT = 1;
+
     /**
      * @var int
      * @ORM\Id
@@ -19,7 +22,7 @@ class Voucher
     protected $id;
 
     /**
-     * @var \App\Entity\Store
+     * @var Store
      * @ORM\ManyToOne(targetEntity="Store")
      * @ORM\JoinColumn(name="store_id", referencedColumnName="id", nullable=false)
      */
@@ -37,9 +40,6 @@ class Voucher
      */
     protected $type;
 
-    const TYPE_PERCENTAGE = 0;
-    const TYPE_EXACT = 1;
-
     /**
      * @var int
      * @ORM\Column(type="integer")
@@ -47,7 +47,7 @@ class Voucher
     protected $amount;
 
     /**
-     * @return int
+     * @return int The ID
      */
     public function getId(): int
     {
@@ -55,7 +55,7 @@ class Voucher
     }
 
     /**
-     * @return \App\Entity\Store
+     * @return Store The store
      */
     public function getStore(): Store
     {
@@ -63,7 +63,7 @@ class Voucher
     }
 
     /**
-     * @param \App\Entity\Store $store
+     * @param Store $store The store
      *
      * @return $this
      */
@@ -75,7 +75,7 @@ class Voucher
     }
 
     /**
-     * @return string
+     * @return string The code
      */
     public function getCode(): string
     {
@@ -83,7 +83,7 @@ class Voucher
     }
 
     /**
-     * @param string $code
+     * @param string $code The code
      *
      * @return $this
      */
@@ -95,7 +95,7 @@ class Voucher
     }
 
     /**
-     * @return int
+     * @return int The type
      */
     public function getType(): int
     {
@@ -103,7 +103,7 @@ class Voucher
     }
 
     /**
-     * @param int $type
+     * @param int $type The type
      *
      * @return $this
      */
@@ -115,7 +115,7 @@ class Voucher
     }
 
     /**
-     * @return int
+     * @return int The amount
      */
     public function getAmount(): int
     {
@@ -123,7 +123,7 @@ class Voucher
     }
 
     /**
-     * @param int $amount
+     * @param int $amount The amount
      *
      * @return $this
      */

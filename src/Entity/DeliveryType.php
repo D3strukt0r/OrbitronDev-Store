@@ -19,7 +19,7 @@ class DeliveryType
     protected $id;
 
     /**
-     * @var \App\Entity\Store
+     * @var Store
      * @ORM\ManyToOne(targetEntity="Store")
      * @ORM\JoinColumn(name="store_id", referencedColumnName="id", nullable=false)
      */
@@ -44,7 +44,7 @@ class DeliveryType
     protected $price;
 
     /**
-     * @return int
+     * @return int The ID
      */
     public function getId(): int
     {
@@ -52,7 +52,7 @@ class DeliveryType
     }
 
     /**
-     * @return \App\Entity\Store
+     * @return Store The store
      */
     public function getStore(): Store
     {
@@ -60,7 +60,7 @@ class DeliveryType
     }
 
     /**
-     * @param \App\Entity\Store $store
+     * @param Store $store The store
      *
      * @return $this
      */
@@ -72,7 +72,7 @@ class DeliveryType
     }
 
     /**
-     * @return string
+     * @return string The type
      */
     public function getType(): string
     {
@@ -80,7 +80,7 @@ class DeliveryType
     }
 
     /**
-     * @param string $type
+     * @param string $type The type
      *
      * @return $this
      */
@@ -92,7 +92,7 @@ class DeliveryType
     }
 
     /**
-     * @return null|string
+     * @return string|null The description
      */
     public function getDescription(): ?string
     {
@@ -100,7 +100,7 @@ class DeliveryType
     }
 
     /**
-     * @param null|string $description
+     * @param string|null $description The description
      *
      * @return $this
      */
@@ -112,7 +112,7 @@ class DeliveryType
     }
 
     /**
-     * @return float
+     * @return float The price
      */
     public function getPrice(): float
     {
@@ -120,7 +120,7 @@ class DeliveryType
     }
 
     /**
-     * @param float $price
+     * @param float $price The price
      *
      * @return $this
      */

@@ -2,9 +2,10 @@
 
 namespace App\Controller\Panel;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use App\Entity\Store;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class HomeController extends Controller
+class HomeController extends AbstractController
 {
     public static function __setupNavigation()
     {
@@ -24,11 +25,14 @@ class HomeController extends Controller
         return 1;
     }
 
-    public function home($navigation, $store)
+    public function home(Store $store, $navigation)
     {
-        return $this->render('theme_admin1/home.html.twig', [
-            'navigation_links' => $navigation,
-            'current_store' => $store,
-        ]);
+        return $this->render(
+            'theme_admin1/home.html.twig',
+            [
+                'navigation_links' => $navigation,
+                'current_store' => $store,
+            ]
+        );
     }
 }

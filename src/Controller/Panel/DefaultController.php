@@ -2,9 +2,10 @@
 
 namespace App\Controller\Panel;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use App\Entity\Store;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class DefaultController extends Controller
+class DefaultController extends AbstractController
 {
     public static function __setupNavigation()
     {
@@ -22,11 +23,14 @@ class DefaultController extends Controller
         return 0;
     }
 
-    public function notFound($navigation, $store)
+    public function notFound(Store $store, $navigation)
     {
-        return $this->render('theme_admin1/not-found.html.twig', [
-            'navigation_links' => $navigation,
-            'current_store' => $store,
-        ]);
+        return $this->render(
+            'theme_admin1/not-found.html.twig',
+            [
+                'navigation_links' => $navigation,
+                'current_store' => $store,
+            ]
+        );
     }
 }

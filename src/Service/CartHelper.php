@@ -8,7 +8,8 @@ use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\Store;
 use App\Entity\User;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -17,41 +18,41 @@ class CartHelper
     private $initialised = false;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager
+     * @var EntityManagerInterface
      */
     private $em;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request
+     * @var Request
      */
     private $request;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
+     * @var SessionInterface
      */
     private $session;
 
     /**
-     * @var \App\Entity\Store
+     * @var Store
      */
     private $store;
 
     /**
-     * @var \App\Entity\User|null
+     * @var User|null
      */
     private $user;
 
     /**
-     * @var \App\Entity\Cart|null
+     * @var Cart|null
      */
     private $cart;
 
     /**
-     * @param \Doctrine\Common\Persistence\ObjectManager                 $em
-     * @param \Symfony\Component\HttpFoundation\RequestStack             $requestStack
-     * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
+     * @param EntityManagerInterface $em           The entity manager
+     * @param RequestStack           $requestStack The request stack
+     * @param SessionInterface       $session      The session
      */
-    public function __construct(ObjectManager $em, RequestStack $requestStack, SessionInterface $session)
+    public function __construct(EntityManagerInterface $em, RequestStack $requestStack, SessionInterface $session)
     {
         $this->em = $em;
         $this->request = $requestStack->getCurrentRequest();
@@ -61,8 +62,8 @@ class CartHelper
     /**
      * Obligatory to add additional information, as it's impossible to add this through the service injector.
      *
-     * @param \App\Entity\Store     $store
-     * @param \App\Entity\User|null $user
+     * @param Store     $store The store
+     * @param User|null $user  The user
      */
     public function initialise(Store $store, User $user = null): void
     {
@@ -72,16 +73,19 @@ class CartHelper
 
         // If user exists (logged in)
         if (null !== $this->user) {
-            /** @var \App\Entity\Cart|null $cart */
+            /** @var Cart|null $cart */
             $cart = $this->em->getRepository(Cart::class)->findOneBy(['store' => $this->store, 'user' => $this->user]);
         } else {
             // If user doesn't exit (not logged in)
-            /** @var \App\Entity\Cart|null $cart */
+            /** @var Cart|null $cart */
             $id = $this->store->getId();
-            $cart = $this->em->getRepository(Cart::class)->findOneBy([
-                'store' => $this->store,
-                'id' => $this->session->get("cart[$id]"),
-            ]);
+            $cart = $this->em->getRepository(Cart::class)->findOneBy(
+                [
+                    'store' => $this->store,
+                    'id' => $this->session->get("cart[{$id}]"),
+                ]
+            )
+            ;
         }
 
         // If cart exists
@@ -90,31 +94,6 @@ class CartHelper
         } else { // If cart doesn't exist (not created yet)
             $this->createNewCart();
         }
-    }
-
-    /**
-     * Creates a new cart in the database.
-     */
-    private function createNewCart(): void
-    {
-        if (!$this->initialised) {
-            return;
-        }
-
-        $newCart = (new Cart())
-            ->setStore($this->store)
-            ->setUser($this->user)
-            ->setProducts([]);
-
-        $this->em->persist($newCart);
-        $this->em->flush();
-
-        if (null === $this->user) {
-            $id = $this->session->getId();
-            $this->session->set("cart[$id]", $newCart->getId());
-        }
-
-        $this->cart = $newCart;
     }
 
     /**
@@ -133,8 +112,8 @@ class CartHelper
     /**
      * Add a product to the cart.
      *
-     * @param \App\Entity\Product $product (Required) to know which product
-     * @param int                 $count   (Optional) Amount to be added
+     * @param Product $product (Required) to know which product
+     * @param int     $count   (Optional) Amount to be added
      */
     public function addToCart(Product $product, int $count = 1): void
     {
@@ -221,7 +200,7 @@ class CartHelper
             $userCurrency = $this->request->getSession()->get('_currency');
 
             foreach ($products as $key => $item) {
-                /** @var \App\Entity\Product $product */
+                /** @var Product $product */
                 $product = $this->em->getRepository(Product::class)->findOneBy(['id' => $item['id']]);
                 $products[$key] = $product->toArray();
 
@@ -229,7 +208,9 @@ class CartHelper
                 $products[$key]['description'] = $product->getDescription($userLanguage);
                 $products[$key]['price'] = $product->getPrice($userCurrency);
                 $products[$key]['in_sale'] = $product->isInSale($userCurrency);
-                $products[$key]['price_sale'] = $products[$key]['in_sale'] ? $product->getSalePrice($userCurrency) : false;
+                $products[$key]['price_sale'] = $products[$key]['in_sale'] ? $product->getSalePrice(
+                    $userCurrency
+                ) : false;
 
                 $products[$key]['in_cart'] = $item['count'];
                 $products[$key]['subtotal'] = $item['count'] * ($products[$key]['in_sale'] ? $products[$key]['price_sale'] : $products[$key]['price']);
@@ -261,7 +242,7 @@ class CartHelper
 
         // Update "stock_available" for every product in cart
         foreach ($this->cart->getProducts() as $key => $productInfo) {
-            /** @var \App\Entity\Product $product */
+            /** @var Product $product */
             $product = $this->em->getRepository(Product::class)->findOneBy(['id' => $productInfo['id']]);
             $currentStock = $product->getStock();
             $newStock = $currentStock - $productInfo['count'];
@@ -270,8 +251,11 @@ class CartHelper
         $this->em->flush();
 
         // Save the order
-        /** @var \App\Entity\DeliveryType|null $deliveryType */
-        $deliveryType = $this->em->getRepository(DeliveryType::class)->findOneBy(['id' => $order_info['delivery_type']]);
+        /** @var DeliveryType|null $deliveryType */
+        $deliveryType = $this->em->getRepository(DeliveryType::class)->findOneBy(
+            ['id' => $order_info['delivery_type']]
+        )
+        ;
 
         $newOrder = new Order();
         $newOrder
@@ -284,8 +268,35 @@ class CartHelper
             ->setCity($order_info['location_city'])
             ->setCountry($order_info['location_country'])
             ->setDeliveryType($deliveryType)
-            ->setProductList($this->cart->getProducts());
+            ->setProductList($this->cart->getProducts())
+        ;
         $this->em->persist($newOrder);
         $this->em->flush();
+    }
+
+    /**
+     * Creates a new cart in the database.
+     */
+    private function createNewCart(): void
+    {
+        if (!$this->initialised) {
+            return;
+        }
+
+        $newCart = (new Cart())
+            ->setStore($this->store)
+            ->setUser($this->user)
+            ->setProducts([])
+        ;
+
+        $this->em->persist($newCart);
+        $this->em->flush();
+
+        if (null === $this->user) {
+            $id = $this->session->getId();
+            $this->session->set("cart[{$id}]", $newCart->getId());
+        }
+
+        $this->cart = $newCart;
     }
 }

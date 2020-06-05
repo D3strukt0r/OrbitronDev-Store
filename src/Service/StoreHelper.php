@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Store;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 class StoreHelper
 {
@@ -19,11 +19,11 @@ class StoreHelper
     ];
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager
+     * @var EntityManagerInterface
      */
     private $em;
 
-    public function __construct(ObjectManager $manager)
+    public function __construct(EntityManagerInterface $manager)
     {
         $this->em = $manager;
     }
@@ -37,7 +37,7 @@ class StoreHelper
      */
     public function urlExists($url)
     {
-        /** @var \App\Entity\Store[] $find */
+        /** @var Store[] $find */
         $find = $this->em->getRepository(Store::class)->findBy(['url' => $url]);
 
         if (count($find)) {

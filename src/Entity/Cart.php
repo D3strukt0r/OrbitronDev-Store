@@ -19,14 +19,14 @@ class Cart
     protected $id;
 
     /**
-     * @var \App\Entity\Store
+     * @var Store
      * @ORM\ManyToOne(targetEntity="Store", inversedBy="products")
      * @ORM\JoinColumn(name="store_id", referencedColumnName="id", nullable=false)
      */
     protected $store;
 
     /**
-     * @var \App\Entity\User|null
+     * @var User|null
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
@@ -39,7 +39,7 @@ class Cart
     protected $products;
 
     /**
-     * @return int
+     * @return int The ID
      */
     public function getId(): int
     {
@@ -47,7 +47,7 @@ class Cart
     }
 
     /**
-     * @return \App\Entity\Store
+     * @return Store The store
      */
     public function getStore(): Store
     {
@@ -55,7 +55,7 @@ class Cart
     }
 
     /**
-     * @param \App\Entity\Store $store
+     * @param Store $store The store
      *
      * @return $this
      */
@@ -67,7 +67,7 @@ class Cart
     }
 
     /**
-     * @return \App\Entity\User|null
+     * @return User|null The user
      */
     public function getUser(): ?User
     {
@@ -75,7 +75,7 @@ class Cart
     }
 
     /**
-     * @param \App\Entity\User|null $user
+     * @param User|null $user The user
      *
      * @return $this
      */
@@ -87,7 +87,7 @@ class Cart
     }
 
     /**
-     * @return array
+     * @return array The products
      */
     public function getProducts(): array
     {
@@ -95,7 +95,7 @@ class Cart
     }
 
     /**
-     * @param array $products
+     * @param array $products The products
      *
      * @return $this
      */
@@ -107,7 +107,7 @@ class Cart
     }
 
     /**
-     * @return array
+     * @return array An array of all the properties in an object
      */
     public function toArray(): array
     {

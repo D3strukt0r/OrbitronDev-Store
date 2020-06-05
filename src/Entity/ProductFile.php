@@ -19,7 +19,7 @@ class ProductFile
     protected $id;
 
     /**
-     * @var \App\Entity\Product
+     * @var Product
      * @ORM\ManyToOne(targetEntity="Product", inversedBy="files")
      * @ORM\JoinColumn(name="product_id", referencedColumnName="id", nullable=false)
      */
@@ -32,7 +32,7 @@ class ProductFile
     protected $file;
 
     /**
-     * @return int
+     * @return int The ID
      */
     public function getId(): int
     {
@@ -40,7 +40,7 @@ class ProductFile
     }
 
     /**
-     * @return \App\Entity\Product
+     * @return Product The product
      */
     public function getProduct(): Product
     {
@@ -48,7 +48,7 @@ class ProductFile
     }
 
     /**
-     * @param \App\Entity\Product $product
+     * @param Product $product The product
      *
      * @return $this
      */
@@ -60,7 +60,7 @@ class ProductFile
     }
 
     /**
-     * @return string
+     * @return string The file
      */
     public function getFile(): string
     {
@@ -68,7 +68,7 @@ class ProductFile
     }
 
     /**
-     * @param string $file
+     * @param string $file The file
      *
      * @return $this
      */

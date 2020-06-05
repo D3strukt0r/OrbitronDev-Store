@@ -19,7 +19,7 @@ class ProductImages
     protected $id;
 
     /**
-     * @var \App\Entity\Product
+     * @var Product
      * @ORM\ManyToOne(targetEntity="Product", inversedBy="images")
      * @ORM\JoinColumn(name="product_id", referencedColumnName="id", nullable=false)
      */
@@ -32,7 +32,7 @@ class ProductImages
     protected $image;
 
     /**
-     * @return int
+     * @return int The ID
      */
     public function getId(): int
     {
@@ -40,7 +40,7 @@ class ProductImages
     }
 
     /**
-     * @return \App\Entity\Product
+     * @return Product The product
      */
     public function getProduct(): Product
     {
@@ -48,7 +48,7 @@ class ProductImages
     }
 
     /**
-     * @param \App\Entity\Product $product
+     * @param Product $product The product
      *
      * @return $this
      */
@@ -60,7 +60,7 @@ class ProductImages
     }
 
     /**
-     * @return string
+     * @return string The image
      */
     public function getImage(): string
     {
@@ -68,7 +68,7 @@ class ProductImages
     }
 
     /**
-     * @param string $image
+     * @param string $image The image
      *
      * @return $this
      */
