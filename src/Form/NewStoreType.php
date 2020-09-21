@@ -69,7 +69,8 @@ class NewStoreType extends AbstractType
                         ),
                         new Expression(
                             [
-                                'expression' => 'value not in ["new-store", "admin", "login", "login-check", "logout", "user", "setup"]',
+                                'expression' => 'value not in ["new-store", "admin", "login", "login-check", ' .
+                                    '"logout", "user", "setup"]',
                                 'message' => 'new_store.url.not_equal_to',
                             ]
                         ),

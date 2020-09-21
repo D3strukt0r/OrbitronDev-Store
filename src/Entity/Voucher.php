@@ -10,8 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Voucher
 {
-    const TYPE_PERCENTAGE = 0;
-    const TYPE_EXACT = 1;
+    public const TYPE_PERCENTAGE = 0;
+    public const TYPE_EXACT = 1;
 
     /**
      * @var int

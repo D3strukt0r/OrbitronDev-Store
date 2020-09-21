@@ -142,7 +142,7 @@ class ShopController extends AbstractController
             $em->flush();
 
             header(
-                'Location: '.$this->generateUrl('store_admin', ['store' => $store->getUrl(), 'page' => 'catalogue'])
+                'Location: ' . $this->generateUrl('store_admin', ['store' => $store->getUrl(), 'page' => 'catalogue'])
             );
             exit;
         }
@@ -240,7 +240,10 @@ class ShopController extends AbstractController
             $em->persist($voucher);
             $em->flush();
 
-            header('Location: '.$this->generateUrl('store_admin', ['store' => $store->getUrl(), 'page' => 'vouchers']));
+            header(
+                'Location: ' .
+                $this->generateUrl('store_admin', ['store' => $store->getUrl(), 'page' => 'vouchers'])
+            );
             exit;
         }
 
@@ -271,7 +274,7 @@ class ShopController extends AbstractController
             $em->flush();
         }
 
-        header('Location: '.$this->generateUrl('store_admin', ['store' => $store->getUrl(), 'page' => 'orders']));
+        header('Location: ' . $this->generateUrl('store_admin', ['store' => $store->getUrl(), 'page' => 'orders']));
         exit;
     }
 
@@ -292,7 +295,7 @@ class ShopController extends AbstractController
             $em->flush();
         }
 
-        header('Location: '.$this->generateUrl('store_admin', ['store' => $store->getUrl(), 'page' => 'orders']));
+        header('Location: ' . $this->generateUrl('store_admin', ['store' => $store->getUrl(), 'page' => 'orders']));
         exit;
     }
 }

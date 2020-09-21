@@ -10,8 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class StorePaymentMethods
 {
-    const TYPE_BRAINTREE_PRODUCTION = 'braintree_production';
-    const TYPE_BRAINTREE_SANDBOX = 'braintree_sandbox';
+    public const TYPE_BRAINTREE_PRODUCTION = 'braintree_production';
+    public const TYPE_BRAINTREE_SANDBOX = 'braintree_sandbox';
 
     /**
      * @var int

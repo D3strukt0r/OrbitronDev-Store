@@ -10,9 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Order
 {
-    const STATUS_NOT_PROCESSED = 0;
-    const STATUS_IN_PRODUCTION = 1;
-    const STATUS_SENT = 2;
+    public const STATUS_NOT_PROCESSED = 0;
+    public const STATUS_IN_PRODUCTION = 1;
+    public const STATUS_SENT = 2;
 
     /**
      * @var int

@@ -63,7 +63,7 @@ class ECBCurrencyConverter
     {
         $this->translator = $translator;
         $this->kernel = $kernel;
-        $this->sCachedFile = $this->kernel->getProjectDir().'/var/data/currency/currency-data.xml';
+        $this->sCachedFile = $this->kernel->getProjectDir() . '/var/data/currency/currency-data.xml';
     }
 
     public function update()
@@ -103,9 +103,11 @@ class ECBCurrencyConverter
             $this->download($this->sCachedFile);
         }
 
-        if ('currency_does_not_exists' === $this->getRate($from) || ('EUR' !== mb_strtoupper(
-                    $to
-                ) && 'currency_does_not_exists' === $this->getRate($to))) {
+        if (
+            'currency_does_not_exists' === $this->getRate($from) || ('EUR' !== mb_strtoupper(
+                $to
+            ) && 'currency_does_not_exists' === $this->getRate($to))
+        ) {
             return $this->translator->trans('Currency not found');
         }
 

@@ -213,7 +213,10 @@ class CartHelper
                 ) : false;
 
                 $products[$key]['in_cart'] = $item['count'];
-                $products[$key]['subtotal'] = $item['count'] * ($products[$key]['in_sale'] ? $products[$key]['price_sale'] : $products[$key]['price']);
+                $products[$key]['subtotal'] =
+                    $item['count'] * ($products[$key]['in_sale']
+                        ? $products[$key]['price_sale']
+                        : $products[$key]['price']);
 
                 if ($add_total) {
                     $totalCount += $products[$key]['in_cart'];
@@ -263,7 +266,7 @@ class CartHelper
             ->setName($order_info['name'])
             ->setEmail($order_info['email'])
             ->setPhone($order_info['phone'])
-            ->setStreet($order_info['location_street'].' '.$order_info['location_street_number'])
+            ->setStreet($order_info['location_street'] . ' ' . $order_info['location_street_number'])
             ->setZipCode($order_info['location_postal_code'])
             ->setCity($order_info['location_city'])
             ->setCountry($order_info['location_country'])

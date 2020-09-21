@@ -307,7 +307,7 @@ class DefaultController extends AbstractController
             $activeAddress = null !== $userData ? $userData->getActiveAddress() : null;
             $checkoutFormData = [
                 'name' => (null !== $userData ? $userData->getFirstName(
-                    ) : '').' '.(null !== $userData ? $userData->getSurname() : ''),
+                ) : '') . ' ' . (null !== $userData ? $userData->getSurname() : ''),
                 'email' => null !== $userData ? $userData->getEmail() : '',
                 'location_street' => null !== $activeAddress ? $activeAddress['street'] : '',
                 'location_street_number' => null !== $activeAddress ? $activeAddress['house_number'] : '',
@@ -380,15 +380,17 @@ class DefaultController extends AbstractController
                 foreach ($productUnavailable as $key => $item) {
                     $this->addFlash(
                         'products_unavailable',
-                        $item['name'].' has only '.$item['stock_available'].' left! You wanted '.$item['count']
+                        $item['name'] . ' has only ' . $item['stock_available'] . ' left! You wanted ' . $item['count']
                     ); // TODO: Missing translation
                 }
             } else {
                 $cart2 = $cartHelper->getCart(true, true);
                 $paymentSuccessful = false;
 
-                if (StorePaymentMethods::TYPE_BRAINTREE_PRODUCTION === $payment['method']->getType(
-                    ) || StorePaymentMethods::TYPE_BRAINTREE_SANDBOX === $payment['method']->getType()) {
+                if (
+                    StorePaymentMethods::TYPE_BRAINTREE_PRODUCTION === $payment['method']->getType(
+                    ) || StorePaymentMethods::TYPE_BRAINTREE_SANDBOX === $payment['method']->getType()
+                ) {
                     $result = $payment['gateway']->transaction()->sale(
                         [
                             'amount' => $cart2['system']['total_price'],
@@ -686,13 +688,13 @@ class DefaultController extends AbstractController
         }
 
         if (null !== $key) {
-            if (is_callable('\\App\\Controller\\Panel\\'.$list[$key]['view'])) {
+            if (is_callable('\\App\\Controller\\Panel\\' . $list[$key]['view'])) {
                 $view = $list[$key]['view'];
             }
         }
 
         return $this->forward(
-            'App\\Controller\\Panel\\'.$view,
+            'App\\Controller\\Panel\\' . $view,
             [
                 'navigation' => $navigationLinks,
                 'request' => $request,

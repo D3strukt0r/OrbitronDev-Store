@@ -61,14 +61,17 @@ class CronJobHelper
      */
     public function runJob(CronJob $job)
     {
-        $className = '\\App\\Service\\CronJob\\'.$job->getScriptFile();
+        $className = '\\App\\Service\\CronJob\\' . $job->getScriptFile();
         if (class_exists($className)) {
             new $className($this->kernel);
 
             $job->setLastExec(new \DateTime());
             $this->em->flush();
         } else {
-            throw new Exception('[CronJob][Fatal Error]: Could not execute cron job. Could not locate script file ("'.$job->getScriptFile().'")');
+            $message = '[CronJob][Fatal Error]: Could not execute cron job. Could not locate script file ("' .
+                $job->getScriptFile() .
+                '")';
+            throw new Exception($message);
         }
     }
 }
